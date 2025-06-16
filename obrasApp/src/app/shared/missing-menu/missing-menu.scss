@@ -1,0 +1,58 @@
+.custom-pos {
+  right: -57px;
+  top: 62px;
+}
+
+::ng-deep {
+  .p-button-label {
+    font-size: 1.2rem;
+  }
+  .p-message-text {
+    width: 100% !important;
+    white-space: wrap;
+  }
+  .p-drawer-right {
+    width: 30rem !important;
+  }
+  @media (max-width: 576px) {
+    .p-drawer-right {
+      width: 100% !important;
+    }
+  }
+  .p-button {
+    z-index: 5;
+    --p-button-primary-background: var(--p-surface-800);
+    --p-button-primary-color: white;
+    --p-button-primary-border-color: #eab308;
+    --p-button-primary-hover-background: #eab308;
+    --p-button-primary-hover-border-color: #eab308;
+    --p-button-primary-hover-color: black;
+    --p-button-primary-active-background: #eab308;
+    --p-button-primary-active-border-color: #eab308;
+  }
+
+  @keyframes glow-pulse {
+    0% {
+      background-color: transparent;
+      color: white;
+      border-color: #eab308;
+    }
+    50% {
+      background-color: #eab308;
+      color: black;
+      border-color: #eab308;
+    }
+    100% {
+      background-color: transparent;
+      color: white;
+      border-color: #eab308;
+    }
+  }
+  .p-button.glow-pulse {
+    animation: glow-pulse 1.5s infinite;
+  }
+}
+
+.word-all {
+  word-break: keep-all;
+}

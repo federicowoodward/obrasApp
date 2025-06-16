@@ -1,0 +1,47 @@
+<div class="absolute -rotate-90 custom-pos">
+  <p-button
+    type="button"
+    label="Faltantes ({{notes().length}})"
+    (click)="openDrawer()"
+    icon="pi pi-arrow-up"
+    [styleClass]="notes().length > 0 && animButton ? 'glow-pulse' : ''"
+  />
+</div>
+<p-drawer
+  header="Faltantes ({{notes().length}})"
+  [(visible)]="visible"
+  position="right"
+>
+  <div *ngIf="notes().length > 0" class="flex flex-column gap-2 pt-2 w-full">
+    <p-message
+      *ngFor="let note of notes()"
+      severity="warn"
+      variant="outlined"
+      class="pt-1"
+    >
+      <div class="flex flex-column gap-2">
+        <div class="flex align-items-center justify-content-between">
+          <h4 class="text-2xl">{{ note.title }}</h4>
+          <div
+            class="flex gap-2 justify-content-center align-items-center cursor-pointer"
+            (click)="goTo(note)"
+          >
+            <p>Ver</p>
+            <p class="pi pi-user" *ngIf="note.type == 'worker'"></p>
+            <p
+              class="material-symbols-outlined"
+              *ngIf="note.type == 'material'"
+            >
+              brick
+            </p>
+            <p class="pi pi-wrench" *ngIf="note.type == 'element'"></p>
+          </div>
+        </div>
+        <p class="text-lx1 text-white pt-1 word-all whitespace-normal w-full">
+          Falta Pintura En Obra 1 Carlo, y El Pelotudo De Marcos Se Chupo Anoche
+          y No Vino
+        </p>
+      </div>
+    </p-message>
+  </div>
+</p-drawer>

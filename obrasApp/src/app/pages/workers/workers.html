@@ -1,0 +1,50 @@
+<div class="p-5 flex flex-column gap-3">
+  <p-table
+    [value]="workers()"
+    dataKey="name"
+    [tableStyle]="{ 'min-width': '45rem'}"
+    editMode="row"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 15%">Nombre</th>
+        <th style="width: 15%">Contraseña</th>
+        <th style="width: 70%">Obras relacionadas</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-worker let-editing="editing">
+      <tr [pEditableRow]="worker">
+        <td pEditableColumn>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="text" [(ngModel)]="worker.name" />
+            </ng-template>
+            <ng-template pTemplate="output"> {{ worker.name }} </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <td pEditableColumn>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="password" [(ngModel)]="worker.password" />
+            </ng-template>
+            <ng-template pTemplate="output">a</ng-template>
+          </p-cellEditor>
+        </td>
+
+        <td pEditableColumn>
+          <p-multiSelect
+            [options]="work()"
+            [(ngModel)]="worker.works_related"
+            optionLabel="title"
+            optionValue="id"
+            placeholder="Obras"
+            display="chip"
+            styleClass="w-full"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

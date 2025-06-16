@@ -1,0 +1,11 @@
+::ng-deep {
+  .p-datatable {
+    overflow: visible;
+  }
+  .p-datatable-table-container {
+    overflow: visible !important;
+  }
+  .p-multiselect-list-container {
+    width: 300px !important;
+  }
+}

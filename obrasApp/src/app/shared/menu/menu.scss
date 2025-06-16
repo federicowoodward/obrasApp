@@ -1,0 +1,18 @@
+::ng-deep {
+  .p-menu {
+    height: 100vh !important;
+    --p-menu-item-padding: 1.2rem 1.7rem;
+    span {
+      font-size: 1.2rem;
+    }
+    .active {
+      background: var(--p-menu-item-focus-background);
+      .p-menu-item-content {
+        border: 1px solid #eab308;
+      }
+    }
+    .p-menu-item-content {
+      border: 1px solid transparent;
+    }
+  }
+}
