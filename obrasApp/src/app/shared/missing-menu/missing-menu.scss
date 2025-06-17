@@ -3,6 +3,13 @@
   top: 62px;
 }
 
+@media (max-width: 768px) {
+  .custom-pos {
+    right: -57px;
+    top: calc(4rem + (62px));
+  }
+}
+
 ::ng-deep {
   .p-button-label {
     font-size: 1.2rem;
@@ -26,30 +33,9 @@
     --p-button-primary-border-color: #eab308;
     --p-button-primary-hover-background: #eab308;
     --p-button-primary-hover-border-color: #eab308;
-    --p-button-primary-hover-color: black;
+    --p-button-primary-hover-color: #18181b;
     --p-button-primary-active-background: #eab308;
     --p-button-primary-active-border-color: #eab308;
-  }
-
-  @keyframes glow-pulse {
-    0% {
-      background-color: transparent;
-      color: white;
-      border-color: #eab308;
-    }
-    50% {
-      background-color: #eab308;
-      color: black;
-      border-color: #eab308;
-    }
-    100% {
-      background-color: transparent;
-      color: white;
-      border-color: #eab308;
-    }
-  }
-  .p-button.glow-pulse {
-    animation: glow-pulse 1.5s infinite;
   }
 }
 

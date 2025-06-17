@@ -4,19 +4,24 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Menu } from 'primeng/menu';
+import { MenuService } from '../../services/menu.service';
+import { CommonModule } from '@angular/common';
+import { Drawer } from 'primeng/drawer';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.html',
   styleUrl: './menu.scss',
-  imports: [Menu],
+  imports: [Menu, CommonModule, Drawer],
 })
 export class MenuComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   activePath: string = '';
+  responsiveMenu = false;
+  private subs = new Subscription();
   private routerSub!: Subscription;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private menuService: MenuService) {}
 
   ngOnInit() {
     this.setItems(this.router.url);
@@ -26,10 +31,25 @@ export class MenuComponent implements OnInit, OnDestroy {
       .subscribe((event: NavigationEnd) => {
         this.setItems(event.urlAfterRedirects);
       });
+
+    this.subs.add(
+      this.router.events
+        .pipe(filter((event) => event instanceof NavigationEnd))
+        .subscribe((event: NavigationEnd) => {
+          this.setItems(event.urlAfterRedirects);
+        })
+    );
+
+    this.subs.add(
+      this.menuService.state$.subscribe((state) => {
+        this.responsiveMenu = state;
+      })
+    );
   }
 
   ngOnDestroy() {
     this.routerSub?.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   private setItems(currentPath: string) {

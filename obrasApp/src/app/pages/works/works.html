@@ -1,7 +1,7 @@
 <div class="p-5 flex flex-column gap-3">
   <h2>Obras</h2>
   <div>
-    <p-card header="Simple Card" subheader="Fecha de inicio: ">
+    <p-card header="Simple Card" subheader="Fecha de inicio: 01/01/2001">
       <p class="m-0">
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed
         consequuntur error repudiandae numquam deserunt quisquam repellat libero
@@ -9,11 +9,11 @@
         cupiditate neque quas!
       </p>
       <ng-template #footer>
-        <div class="flex gap-4 mt-1 justify-content-end">
-          <p-button label="Faltantes" />
+        <div class="flex gap-4 mt-1 justify-content-between">
+          <p-button label="Ver obra" (onClick)="goToWork('1')" />
+          <p-button label="Faltantes en esta obra" styleClass="glow-pulse" />
         </div>
       </ng-template>
     </p-card>
   </div>
 </div>
-<!-- s -->

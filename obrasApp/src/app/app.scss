@@ -1,0 +1,28 @@
+//por alguna razon esta animacion funciona aca pero en styles no, asi que aca queda :)
+::ng-deep {
+  @keyframes glow-pulse {
+    0% {
+      background-color: transparent;
+      color: white;
+      border-color: #eab308;
+    }
+    50% {
+      background-color: #eab308;
+      color: #18181b;
+      border-color: #eab308;
+    }
+    100% {
+      background-color: transparent;
+      color: white;
+      border-color: #eab308;
+    }
+  }
+
+  .p-button.glow-pulse {
+    animation: glow-pulse 1.5s ease-in-out 0s 3;
+  }
+}
+
+.bg-blur {
+  background-color: #09090b;
+}

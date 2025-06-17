@@ -1,4 +1,7 @@
-<div class="flex">
+<div class="absolute md:hidden left-0 right-0 py-3 pl-3 z-5 bg-blur">
+  <p-button (click)="toggleMenu()" icon="pi pi-bars" />
+</div>
+<div class="flex pt-6 md:pt-0 relative">
   <app-menu></app-menu>
   <router-outlet></router-outlet>
   <app-missing-menu></app-missing-menu>

@@ -24,9 +24,6 @@ export class MissingMenu implements OnInit {
 
   ngOnInit(): void {
     this.loadNotes();
-    setTimeout(() => {
-      this.animButton = false;
-    }, 4000); // Titila por 3 segundos
   }
 
   loadNotes() {
