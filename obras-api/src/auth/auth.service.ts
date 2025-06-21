@@ -18,17 +18,37 @@ export class AuthService {
   ) {}
 
   async login({ emailOrName, password }: LoginDto): Promise<any | null> {
-    // 1. Intentar arquitecto
-    const architect = await this.architectRepo.findOne({
+    // 1. Intentar arquitecto con email
+    const architectEmail = await this.architectRepo.findOne({
       where: { email: emailOrName },
     });
-    if (architect && (await bcrypt.compare(password, architect.password))) {
+    if (
+      architectEmail &&
+      (await bcrypt.compare(password, architectEmail.password))
+    ) {
       return {
         role: 'architect',
         user: {
-          id: architect.id,
-          name: architect.name,
-          email: architect.email,
+          id: architectEmail.id,
+          name: architectEmail.name,
+          email: architectEmail.email,
+        },
+      };
+    }
+    // 2. Intentar arquitecto con name
+    const architectName = await this.architectRepo.findOne({
+      where: { name: emailOrName },
+    });
+    if (
+      architectName &&
+      (await bcrypt.compare(password, architectName.password))
+    ) {
+      return {
+        role: 'architect',
+        user: {
+          id: architectName.id,
+          name: architectName.name,
+          email: architectName.email,
         },
       };
     }
