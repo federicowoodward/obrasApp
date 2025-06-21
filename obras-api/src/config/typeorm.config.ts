@@ -11,6 +11,6 @@ export const typeOrmConfig: DataSourceOptions = {
   password: 'admin',
   database: 'testdb',
   synchronize: false, // 👈 CAMBIALO
-  entities: [join(__dirname, '..', 'entities', '*.entity.{ts,js}')],
+  entities: [join(__dirname, '..', 'shared/entities', '*.entity.{ts,js}')],
   migrations: [join(__dirname, '..', 'migrations', '*.{ts,js}')],
 };

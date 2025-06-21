@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Architect } from 'src/entities/architect.entity';
-import { ConstructionWorker } from 'src/entities/construction-worker.entity';
+import { Architect } from 'src/shared/entities/architect.entity';
+import { ConstructionWorker } from 'src/shared/entities/construction-worker.entity';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -41,7 +41,6 @@ export class AuthService {
     // Buscar trabajador solo por nombre (suposición: trabajadores no tienen email)
     const worker = await this.workerRepo.findOne({
       where: { name: emailOrName },
-      relations: ['construction', 'category'],
     });
 
     if (worker && (await bcrypt.compare(password, worker.password))) {
@@ -51,7 +50,6 @@ export class AuthService {
           id: worker.id,
           name: worker.name,
           constructionId: worker.construction?.id ?? null,
-          categoryId: worker.category?.id ?? null,
         },
       };
     }

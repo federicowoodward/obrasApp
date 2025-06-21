@@ -8,7 +8,7 @@ import { ApiTags, ApiCreatedResponse } from '@nestjs/swagger';
 export class ArchitectController {
   constructor(private readonly architectService: ArchitectService) {}
 
-  @Post()
+  @Post('up')
   @ApiCreatedResponse({ description: 'Arquitecto creado con éxito' })
   create(@Body() dto: CreateArchitectDto) {
     return this.architectService.create(dto);

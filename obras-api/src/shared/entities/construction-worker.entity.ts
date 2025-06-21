@@ -23,9 +23,6 @@ export class ConstructionWorker {
   @ManyToOne(() => Architect)
   architect: Architect;
 
-  @ManyToOne(() => Category)
-  category: Category;
-
   @ManyToOne(
     () => Construction,
     (construction) => construction.construction_workers,

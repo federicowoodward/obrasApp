@@ -3,7 +3,7 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Architect } from '../entities/architect.entity';
+import { Architect } from '../shared/entities/architect.entity';
 import { CreateArchitectDto } from './dto/create-architect.dto';
 import * as bcrypt from 'bcryptjs';
 
@@ -30,6 +30,8 @@ export class ArchitectService {
       password: hashedPassword,
       payment_level: dto.payment_level ? { id: dto.payment_level } : undefined,
     });
+
+    // falta crear deposito y historial de manera automatica
 
     const saved = await this.architectRepo.save(architect);
 
