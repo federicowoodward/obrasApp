@@ -18,58 +18,44 @@ export class AuthService {
   ) {}
 
   async login({ emailOrName, password }: LoginDto): Promise<any | null> {
-    // 1. Intentar arquitecto con email
-    const architectEmail = await this.architectRepo.findOne({
-      where: { email: emailOrName },
-    });
-    if (
-      architectEmail &&
-      (await bcrypt.compare(password, architectEmail.password))
-    ) {
+    // Buscar arquitecto por email o nombre en una sola query
+    const architect = await this.architectRepo
+      .createQueryBuilder('architect')
+      .where(
+        'architect.email = :emailOrName OR architect.name = :emailOrName',
+        { emailOrName },
+      )
+      .getOne();
+
+    if (architect && (await bcrypt.compare(password, architect.password))) {
       return {
         role: 'architect',
         user: {
-          id: architectEmail.id,
-          name: architectEmail.name,
-          email: architectEmail.email,
-        },
-      };
-    }
-    // 2. Intentar arquitecto con name
-    const architectName = await this.architectRepo.findOne({
-      where: { name: emailOrName },
-    });
-    if (
-      architectName &&
-      (await bcrypt.compare(password, architectName.password))
-    ) {
-      return {
-        role: 'architect',
-        user: {
-          id: architectName.id,
-          name: architectName.name,
-          email: architectName.email,
+          id: architect.id,
+          name: architect.name,
+          email: architect.email,
         },
       };
     }
 
-    // 2. Intentar obrero
+    // Buscar trabajador solo por nombre (suposición: trabajadores no tienen email)
     const worker = await this.workerRepo.findOne({
       where: { name: emailOrName },
+      relations: ['construction', 'category'],
     });
+
     if (worker && (await bcrypt.compare(password, worker.password))) {
       return {
         role: 'worker',
         user: {
           id: worker.id,
           name: worker.name,
-          constructionId: worker.construction,
-          categoryId: worker.category,
+          constructionId: worker.construction?.id ?? null,
+          categoryId: worker.category?.id ?? null,
         },
       };
     }
 
-    // Si no se encontró en ninguna
     return null;
   }
 }
