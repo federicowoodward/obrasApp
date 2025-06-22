@@ -6,7 +6,14 @@ import { EventsHistory } from 'src/shared/entities/events-history.entity';
 interface LogEventOptions {
   table: string;
   recordId: number;
-  action: 'create' | 'update' | 'delete' | 'move' | 'assign' | 'close';
+  action:
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'move'
+    | 'assign'
+    | 'close'
+    | 'restore';
   actorId: number;
   actorType: 'architect' | 'worker';
   oldData?: any;
@@ -29,7 +36,7 @@ export class EventsHistoryLoggerService {
         move: 'Elemento movido de depósito/obra',
         assign: 'Elemento asignado',
       },
-      worker: {
+      construction_worker: {
         create: 'Obrero agregado',
         update: 'Obrero actualizado',
         delete: 'Obrero eliminado',
@@ -39,6 +46,7 @@ export class EventsHistoryLoggerService {
         create: 'Construcción creada',
         update: 'Construcción actualizada',
         delete: 'Construcción eliminada',
+        restore: 'Construcción recuperada',
       },
       deposit: {
         create: 'Depósito creado',
@@ -100,6 +108,6 @@ export class EventsHistoryLoggerService {
       changed_by_type: actorType,
     });
 
-    await this.historyRepo.save(event);
+    return await this.historyRepo.save(event);
   }
 }

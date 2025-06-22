@@ -16,10 +16,15 @@ export class Note {
   @ManyToOne(() => Element)
   element: Element;
 
-  @ManyToOne(() => Architect)
+  @ManyToOne(() => Architect, { nullable: true }) // 👈 esta era la que faltaba
   architect: Architect;
+
+  @Column()
+  created_by: number;
+
+  @Column()
+  created_by_type: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
-
 }

@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { EventsHistory } from './events-history.entity';
 import { Construction } from './construction.entity';
 
@@ -8,10 +14,8 @@ export class ConstructionSnapshot {
   id: number;
 
   @ManyToOne(() => EventsHistory)
+  @JoinColumn({ name: 'event_id' }) // ⬅️ 👈🏼 IMPORTANTE
   event: EventsHistory;
-
-  @ManyToOne(() => Construction)
-  construction: Construction;
 
   @Column({ type: 'jsonb' })
   snapshot_data: any;

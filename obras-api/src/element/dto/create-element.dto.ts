@@ -25,4 +25,9 @@ export class CreateElementDto {
   @ApiProperty()
   @IsNumber()
   categoryId: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  depositId: number;
 }

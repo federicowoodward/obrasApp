@@ -7,6 +7,8 @@ import { CreateElementDto } from './dto/create-element.dto';
 import { Architect } from 'src/shared/entities/architect.entity';
 import { Category } from 'src/shared/entities/category.entity';
 import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
+import { ElementLocationService } from 'src/element-location/element-location.service';
+import { Deposit } from 'src/shared/entities/deposit.entity';
 
 @Injectable()
 export class ElementService {
@@ -21,6 +23,7 @@ export class ElementService {
     private readonly architectRepo: Repository<Architect>,
 
     private readonly logger: EventsHistoryLoggerService,
+    private readonly locationService: ElementLocationService,
   ) {}
 
   async create(architectId: number, dto: CreateElementDto) {
@@ -41,6 +44,11 @@ export class ElementService {
     });
 
     const saved = await this.elementRepo.save(element);
+
+    await this.locationService.updateLocation(saved.id, {
+      location_type: 'deposit',
+      location_id: dto.depositId,
+    });
 
     await this.logger.logEvent({
       table: 'element',

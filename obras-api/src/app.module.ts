@@ -16,10 +16,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ElementMoveModule } from './element-move/element-move.module';
 
 @Module({
   imports: [
     ArchitectModule,
+    AuthModule,
     PlanLimitModule,
     ConstructionModule,
     ConstructionWorkerModule,
@@ -28,16 +30,17 @@ import { ConfigModule } from '@nestjs/config';
     NoteModule,
     MissingModule,
     EventsHistoryModule,
-    ElementMoveDetailModule,
     ConstructionSnapshotModule,
+    ElementMoveDetailModule,
     ElementLocationModule,
+    ElementMoveModule,
     CategoryModule,
-    AuthModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // 🔥 lee .env.dev si NODE_ENV=development
       isGlobal: true,
     }),
+    ElementMoveModule,
   ],
   controllers: [],
   providers: [],
