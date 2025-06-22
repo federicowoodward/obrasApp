@@ -25,37 +25,58 @@ export class EventsHistoryLoggerService {
       element: {
         create: 'Elemento creado',
         update: 'Elemento actualizado',
+        delete: 'Elemento eliminado',
         move: 'Elemento movido de depósito/obra',
+        assign: 'Elemento asignado',
       },
       worker: {
         create: 'Obrero agregado',
         update: 'Obrero actualizado',
-        delete: 'Obrero borrado',
-        assign: 'Obrero asignado',
+        delete: 'Obrero eliminado',
+        assign: 'Obrero asignado a obra',
       },
       construction: {
-        create: 'Construccion agregada',
-        update: 'Construccion actualizada',
-        delete: 'Construccion borrada',
-        assign: 'Construccion asignada',
+        create: 'Construcción creada',
+        update: 'Construcción actualizada',
+        delete: 'Construcción eliminada',
       },
-      // ...
+      deposit: {
+        create: 'Depósito creado',
+        update: 'Depósito actualizado',
+        delete: 'Depósito eliminado',
+      },
+      note: {
+        create: 'Nota agregada',
+        update: 'Nota actualizada',
+        delete: 'Nota eliminada',
+      },
+      category: {
+        create: 'Categoría creada',
+        update: 'Categoría actualizada',
+        delete: 'Categoría eliminada',
+      },
+      architect: {
+        create: 'Cuenta de arquitecto creada',
+        login: 'Inicio de sesión',
+      },
     };
 
-    //borrar en prod
-    let t = map[table]?.[action] ?? 'Acción no definida';
-    if (t === 'Acción no definida')
+    const description = map[table]?.[action] ?? 'Acción no definida';
+
+    if (
+      description === 'Acción no definida' &&
+      process.env.NODE_ENV === 'development'
+    ) {
       console.log(
-        '------- Acción no definida-------------',
-        'table: ',
+        '⚠️ Acción no definida',
+        '→ table:',
         table,
-        '//',
-        'action: ',
+        '| action:',
         action,
       );
-    //
+    }
 
-    return map[table]?.[action] ?? 'Acción no definida';
+    return description;
   }
 
   async logEvent({
