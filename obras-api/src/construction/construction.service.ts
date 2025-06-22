@@ -5,6 +5,7 @@ import { Construction } from 'src/shared/entities/construction.entity';
 import { Repository } from 'typeorm';
 import { CreateConstructionDto } from './dto/create-construction.dto';
 import { Architect } from 'src/shared/entities/architect.entity';
+import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
 
 @Injectable()
 export class ConstructionService {
@@ -14,10 +15,14 @@ export class ConstructionService {
 
     @InjectRepository(Architect)
     private readonly architectRepo: Repository<Architect>,
+
+    private readonly logger: EventsHistoryLoggerService,
   ) {}
 
   async create(architectId: number, dto: CreateConstructionDto) {
-    const architect = await this.architectRepo.findOne({ where: { id: architectId } });
+    const architect = await this.architectRepo.findOne({
+      where: { id: architectId },
+    });
     if (!architect) throw new NotFoundException('Arquitecto no encontrado');
 
     const construction = this.constructionRepo.create({
@@ -26,7 +31,18 @@ export class ConstructionService {
       architect,
     });
 
-    return this.constructionRepo.save(construction);
+    const saved = await this.constructionRepo.save(construction);
+
+    await this.logger.logEvent({
+      table: 'construction',
+      recordId: saved.id,
+      action: 'create',
+      actorId: architectId,
+      actorType: 'architect',
+      newData: saved,
+    });
+
+    return saved;
   }
 
   async findAllByArchitect(architectId: number) {
@@ -37,20 +53,52 @@ export class ConstructionService {
   }
 
   async delete(id: number, architectId: number) {
-    const found = await this.constructionRepo.findOne({ where: { id, architect: { id: architectId } } });
-    if (!found) throw new NotFoundException('Construcción no encontrada o no pertenece a este arquitecto');
+    const found = await this.constructionRepo.findOne({
+      where: { id, architect: { id: architectId } },
+    });
+    if (!found)
+      throw new NotFoundException(
+        'Construcción no encontrada o no pertenece a este arquitecto',
+      );
 
     await this.constructionRepo.remove(found);
+
+    await this.logger.logEvent({
+      table: 'construction',
+      recordId: id,
+      action: 'delete',
+      actorId: architectId,
+      actorType: 'architect',
+      oldData: found,
+    });
+
     return { deleted: true };
   }
 
   async update(id: number, architectId: number, dto: CreateConstructionDto) {
-    const construction = await this.constructionRepo.findOne({ where: { id, architect: { id: architectId } } });
-    if (!construction) throw new NotFoundException('Construcción no encontrada');
+    const construction = await this.constructionRepo.findOne({
+      where: { id, architect: { id: architectId } },
+    });
+    if (!construction)
+      throw new NotFoundException('Construcción no encontrada');
+
+    const oldData = { ...construction };
 
     construction.title = dto.title;
     construction.description = dto.description;
 
-    return this.constructionRepo.save(construction);
+    const updated = await this.constructionRepo.save(construction);
+
+    await this.logger.logEvent({
+      table: 'construction',
+      recordId: updated.id,
+      action: 'update',
+      actorId: architectId,
+      actorType: 'architect',
+      oldData,
+      newData: updated,
+    });
+
+    return updated;
   }
 }

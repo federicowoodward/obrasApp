@@ -7,7 +7,7 @@ import { CreateConstructionWorkerDto } from './dto/create-construction-worker.dt
 import { UpdateConstructionWorkerDto } from './dto/update-construction-worker.dto';
 import { Construction } from 'src/shared/entities/construction.entity';
 import * as bcrypt from 'bcryptjs';
-import { Category } from 'src/shared/entities/category.entity';
+import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
 
 @Injectable()
 export class ConstructionWorkerService {
@@ -18,8 +18,7 @@ export class ConstructionWorkerService {
     @InjectRepository(Construction)
     private readonly constructionRepo: Repository<Construction>,
 
-    @InjectRepository(Construction)
-    private readonly categoryRepo: Repository<Category>,
+    private readonly logger: EventsHistoryLoggerService,
   ) {}
 
   async create(architectId: number, dto: CreateConstructionWorkerDto) {
@@ -38,7 +37,18 @@ export class ConstructionWorkerService {
       construction: { id: dto.constructionId },
     });
 
-    return await this.workerRepo.save(worker);
+    const saved = await this.workerRepo.save(worker);
+
+    await this.logger.logEvent({
+      table: 'construction_worker',
+      recordId: saved.id,
+      action: 'create',
+      actorId: architectId,
+      actorType: 'architect',
+      newData: saved,
+    });
+
+    return saved;
   }
 
   async findAll(architectId: number) {
@@ -64,6 +74,9 @@ export class ConstructionWorkerService {
     dto: UpdateConstructionWorkerDto,
   ) {
     const worker = await this.findOne(architectId, id);
+    if (!worker) throw new NotFoundException('Construcción no encontrada');
+
+    const oldData = { ...worker };
 
     if (dto.password) {
       dto.password = await bcrypt.hash(dto.password, 10);
@@ -76,7 +89,19 @@ export class ConstructionWorkerService {
         : worker.construction,
     });
 
-    return await this.workerRepo.save(worker);
+    const updated = await this.workerRepo.save(worker);
+
+    await this.logger.logEvent({
+      table: 'construction_worker',
+      recordId: updated.id,
+      action: 'update',
+      actorId: architectId,
+      actorType: 'architect',
+      oldData,
+      newData: updated,
+    });
+
+    return updated;
   }
 
   async remove(architectId: number, id: number) {

@@ -6,6 +6,7 @@ import { ConstructionWorker } from 'src/shared/entities/construction-worker.enti
 import { Category } from 'src/shared/entities/category.entity';
 import { Construction } from 'src/shared/entities/construction.entity';
 import { Architect } from 'src/shared/entities/architect.entity';
+import { EventsHistoryLoggerModule } from 'src/shared/services/events-history/events-history-logger.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { Architect } from 'src/shared/entities/architect.entity';
       Construction,
       Architect,
     ]),
+    EventsHistoryLoggerModule,
   ],
   controllers: [ConstructionWorkerController],
   providers: [ConstructionWorkerService],
