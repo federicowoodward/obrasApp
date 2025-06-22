@@ -28,7 +28,9 @@ export class EventsHistory {
   @Column()
   changed_by: number;
 
+  @Column()
+  changed_by_type: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
-
 }

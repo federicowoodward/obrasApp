@@ -18,7 +18,6 @@ export class AuthService {
   ) {}
 
   async login({ emailOrName, password }: LoginDto): Promise<any | null> {
-    // Buscar arquitecto por email o nombre en una sola query
     const architect = await this.architectRepo
       .createQueryBuilder('architect')
       .where(
@@ -38,7 +37,6 @@ export class AuthService {
       };
     }
 
-    // Buscar trabajador solo por nombre (suposición: trabajadores no tienen email)
     const worker = await this.workerRepo.findOne({
       where: { name: emailOrName },
     });
