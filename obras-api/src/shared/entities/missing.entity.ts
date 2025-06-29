@@ -15,7 +15,7 @@ export class Missing {
   text: string;
 
   @ManyToOne(() => ConstructionWorker)
-  construction_worker: ConstructionWorker;
+  constructionWorker: ConstructionWorker;
 
   @ManyToOne(() => Construction)
   construction: Construction;
@@ -24,6 +24,6 @@ export class Missing {
   architect: Architect;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 
 }

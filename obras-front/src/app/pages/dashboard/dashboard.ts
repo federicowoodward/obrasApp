@@ -10,12 +10,9 @@ import { ApiService } from '../../core/http/api';
 })
 export class Dashboard implements OnInit {
   constructor(private api: ApiService) {}
+  dato: any = [];
 
   ngOnInit() {
-    this.api.request('GET', 'category').subscribe((res) => console.log(res));
-
-    // this.api
-    //   .request('POST', 'users', { name: 'Juan' })
-    //   .subscribe((res) => console.log(res));
+    this.api.request('GET', 'category').subscribe((res) => (this.dato = res));
   }
 }

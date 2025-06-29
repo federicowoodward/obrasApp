@@ -16,8 +16,8 @@ export class ElementMoveService {
   async move(dto: MoveElementDto) {
     // 1. Actualizar ubicación actual
     await this.locationService.updateLocation(dto.elementId, {
-      location_type: dto.toType,
-      location_id: dto.toId,
+      locationType: dto.toType,
+      locationId: dto.toId,
     });
 
     // 2. Log en EventsHistory
@@ -27,8 +27,8 @@ export class ElementMoveService {
       action: 'move',
       actorId: dto.movedBy,
       actorType: dto.movedByType,
-      oldData: { location_type: dto.fromType, location_id: dto.fromId },
-      newData: { location_type: dto.toType, location_id: dto.toId },
+      oldData: { locationType: dto.fromType, locationId: dto.fromId },
+      newData: { locationType: dto.toType, locationId: dto.toId },
     });
 
     // 3. Guardar detalle

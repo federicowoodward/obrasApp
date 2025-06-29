@@ -25,11 +25,11 @@ export class ConstructionWorker {
 
   @ManyToOne(
     () => Construction,
-    (construction) => construction.construction_workers,
+    (construction) => construction.constructionWorkers,
   )
-  @JoinColumn({ name: 'construction_id' })
+  @JoinColumn({ name: 'constructionId' })
   construction: Construction;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

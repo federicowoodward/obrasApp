@@ -5,6 +5,9 @@ import { map, tap } from 'rxjs/operators';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+// GET y DELETE NO envian datos
+// POST Y PUT, PATCH envian datos
+
 interface ApiResponse<T> {
   data: T;
   error: any;
@@ -57,9 +60,7 @@ export class ApiService {
 
     return req$.pipe(
       tap((resp) => {
-        console.groupCollapsed(
-          `[API] ${method} ${fullUrl}`
-        );
+        console.groupCollapsed(`[API] ${method} ${fullUrl}`);
         if (data) console.log('Body:', data);
         if (params) console.log('Params:', params);
         if (resp.data) {

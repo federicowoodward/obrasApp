@@ -25,10 +25,10 @@ export class ElementMoveDetailService {
     const record = this.repo.create({
       event: { id: data.eventId },
       element: { id: data.elementId },
-      from_location_type: data.fromType,
-      from_location_id: data.fromId,
-      to_location_type: data.toType,
-      to_location_id: data.toId,
+      fromLocationType: data.fromType,
+      fromLocationId: data.fromId,
+      toLocationType: data.toType,
+      toLocationId: data.toId,
     });
 
     return this.repo.save(record);

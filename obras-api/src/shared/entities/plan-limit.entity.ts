@@ -10,20 +10,20 @@ export class PlanLimit {
   name: string;
 
   @Column()
-  max_elements: number;
+  maxElements: number;
 
   @Column()
-  max_deposits: number;
+  maxDeposits: number;
 
   @Column()
-  max_constructions: number;
+  maxConstructions: number;
 
   @Column()
-  max_workers: number;
+  maxWorkers: number;
 
-  @OneToMany(() => Architect, (architect) => architect.payment_level)
+  @OneToMany(() => Architect, (architect) => architect.paymentLevel)
   architects: Architect[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

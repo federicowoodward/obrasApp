@@ -11,21 +11,26 @@ export class ElementLocationService {
     private readonly repo: Repository<ElementLocation>,
   ) {}
 
-  async updateLocation(elementId: number, data: { location_type: string; location_id: number }) {
-    const current = await this.repo.findOne({ where: { element: { id: elementId } } });
+  async updateLocation(
+    elementId: number,
+    data: { locationType: string; locationId: number },
+  ) {
+    const current = await this.repo.findOne({
+      where: { element: { id: elementId } },
+    });
 
     if (current) {
-      current.location_type = data.location_type;
-      current.location_id = data.location_id;
-      current.updated_at = new Date();
+      current.locationType = data.locationType;
+      current.locationId = data.locationId;
+      current.updatedAt = new Date();
       return this.repo.save(current);
     }
 
     return this.repo.save(
       this.repo.create({
         element: { id: elementId },
-        location_type: data.location_type,
-        location_id: data.location_id,
+        locationType: data.locationType,
+        locationId: data.locationId,
       }),
     );
   }

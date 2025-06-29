@@ -28,7 +28,7 @@ export class ArchitectService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      payment_level: dto.payment_level ? { id: dto.payment_level } : undefined,
+      paymentLevel: dto.paymentLevel ? { id: dto.paymentLevel } : undefined,
     });
 
     // falta crear deposito y historial de manera automatica

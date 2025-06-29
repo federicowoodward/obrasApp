@@ -46,8 +46,8 @@ export class ElementService {
     const saved = await this.elementRepo.save(element);
 
     await this.locationService.updateLocation(saved.id, {
-      location_type: 'deposit',
-      location_id: dto.depositId,
+      locationType: 'deposit',
+      locationId: dto.depositId,
     });
 
     await this.logger.logEvent({
@@ -86,7 +86,7 @@ export class ElementService {
     existing.name = dto.name;
     existing.brand = dto.brand;
     existing.provider = dto.provider;
-    existing.buy_date = dto.buy_date;
+    existing.buyDate = dto.buyDate;
     existing.category = category;
 
     const updated = await this.elementRepo.save(existing);

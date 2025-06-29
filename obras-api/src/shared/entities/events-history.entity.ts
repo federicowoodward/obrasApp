@@ -8,29 +8,29 @@ export class EventsHistory {
   id: number;
 
   @Column()
-  table_name: string;
+  tableName: string;
 
   @Column()
-  record_id: number;
+  recordId: number;
 
   @Column()
   action: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  old_data: any;
+  oldData: any;
 
   @Column({ type: 'jsonb', nullable: true })
-  new_data: any;
+  newData: any;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  changed_at: Date;
+  changedAt: Date;
 
   @Column()
-  changed_by: number;
+  changedBy: number;
 
   @Column()
-  changed_by_type: string;
+  changedByType: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

@@ -14,12 +14,12 @@ export class ConstructionSnapshot {
   id: number;
 
   @ManyToOne(() => EventsHistory)
-  @JoinColumn({ name: 'event_id' }) // ⬅️ 👈🏼 IMPORTANTE
+  @JoinColumn({ name: 'eventId' }) // ⬅️ 👈🏼 IMPORTANTE
   event: EventsHistory;
 
   @Column({ type: 'jsonb' })
-  snapshot_data: any;
+  snapshotData: any;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

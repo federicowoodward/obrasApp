@@ -21,8 +21,8 @@ export class NoteService {
       title: dto.title,
       text: dto.text,
       element: dto.element,
-      created_by: dto.created_by,
-      created_by_type: dto.created_by_type,
+      createdBy: dto.createdBy,
+      createdByType: dto.createdByType,
     });
     const saved = await this.noteRepo.save(note);
 
@@ -30,8 +30,8 @@ export class NoteService {
       table: 'note',
       recordId: saved.id,
       action: 'create',
-      actorId: dto.created_by,
-      actorType: dto.created_by_type as 'architect' | 'worker',
+      actorId: dto.createdBy,
+      actorType: dto.createdByType as 'architect' | 'worker',
       newData: saved,
     });
 

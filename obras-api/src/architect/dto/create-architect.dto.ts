@@ -24,5 +24,5 @@ export class CreateArchitectDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsInt()
-  payment_level?: number;
+  paymentLevel?: number;
 }

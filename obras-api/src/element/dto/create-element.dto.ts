@@ -20,7 +20,7 @@ export class CreateElementDto {
 
   @ApiProperty({ example: '2025-06-21' })
   @IsDateString()
-  buy_date: string;
+  buyDate: string;
 
   @ApiProperty()
   @IsNumber()

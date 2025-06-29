@@ -28,19 +28,16 @@ export class Architect {
   password: string;
 
   @ManyToOne(() => PlanLimit, (plan) => plan.architects)
-  payment_level: PlanLimit;
+  paymentLevel: PlanLimit;
 
   @OneToMany(() => ConstructionWorker, (cw) => cw.architect)
-  construction_workers: ConstructionWorker[];
+  constructionWorkers: ConstructionWorker[];
 
   @OneToMany(() => Construction, (c) => c.architect)
   constructions: Construction[];
 
   @OneToMany(() => Element, (e) => e.architect)
   elements: Element[];
-
-  @OneToMany(() => Note, (n) => n.architect)
-  notes: Note[];
 
   @OneToMany(() => Missing, (m) => m.architect)
   missings: Missing[];
@@ -49,5 +46,5 @@ export class Architect {
   deposits: Deposit[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

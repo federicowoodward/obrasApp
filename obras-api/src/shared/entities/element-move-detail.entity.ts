@@ -19,17 +19,17 @@ export class ElementMoveDetail {
   element: Element;
 
   @Column({ type: 'enum', enum: LocationType })
-  from_location_type: LocationType;
+  fromLocationType: LocationType;
 
   @Column()
-  from_location_id: number;
+  fromLocationId: number;
 
   @Column({ type: 'enum', enum: LocationType })
-  to_location_type: LocationType;
+  toLocationType: LocationType;
 
   @Column()
-  to_location_id: number;
+  toLocationId: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

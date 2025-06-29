@@ -24,7 +24,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpErrorFilter());
 
-
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

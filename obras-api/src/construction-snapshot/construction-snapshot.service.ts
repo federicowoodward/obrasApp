@@ -22,11 +22,11 @@ export class ConstructionSnapshotService {
   async createSnapshot(event: EventsHistory, construction: Construction) {
     const snapshot = this.snapshotRepo.create({
       event,
-      snapshot_data: {
+      snapshotData: {
         title: construction.title,
         description: construction.description,
-        created_at: construction.created_at,
-        workers: construction.construction_workers?.map((w) => ({
+        createdAt: construction.createdAt,
+        workers: construction.constructionWorkers?.map((w) => ({
           id: w.id,
           name: w.name,
         })),
@@ -48,12 +48,12 @@ export class ConstructionSnapshotService {
 
     if (!snapshot) throw new NotFoundException('Snapshot no encontrada');
 
-    const data = snapshot.snapshot_data;
+    const data = snapshot.snapshotData;
 
     const newConstruction = this.constructionRepo.create({
       title: data.title,
       description: data.description,
-      architect: { id: snapshot.event.changed_by },
+      architect: { id: snapshot.event.changedBy },
     });
 
     const saved = await this.constructionRepo.save(newConstruction);
@@ -65,7 +65,7 @@ export class ConstructionSnapshotService {
       table: 'construction',
       recordId: saved.id,
       action: 'restore',
-      actorId: snapshot.event.changed_by,
+      actorId: snapshot.event.changedBy,
       actorType: 'architect',
       oldData: null,
       newData: data,

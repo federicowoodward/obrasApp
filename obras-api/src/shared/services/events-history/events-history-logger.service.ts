@@ -99,13 +99,13 @@ export class EventsHistoryLoggerService {
     let action_message = this.getActionDescription(table, action);
 
     const event = this.historyRepo.create({
-      table_name: table,
-      record_id: recordId,
+      tableName: table,
+      recordId: recordId,
       action: action_message,
-      old_data: oldData ? JSON.stringify(oldData) : null,
-      new_data: newData ? JSON.stringify(newData) : null,
-      changed_by: actorId,
-      changed_by_type: actorType,
+      oldData: oldData ? JSON.stringify(oldData) : null,
+      newData: newData ? JSON.stringify(newData) : null,
+      changedBy: actorId,
+      changedByType: actorType,
     });
 
     return await this.historyRepo.save(event);

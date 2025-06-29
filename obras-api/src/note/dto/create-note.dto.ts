@@ -19,11 +19,11 @@ export class CreateNoteDto {
   @ApiProperty({ enum: ['architect', 'worker'] })
   @IsString()
   @IsIn(['architect', 'worker'])
-  created_by_type: string;
+  createdByType: string;
 
   @ApiProperty()
   @IsNumber()
-  created_by: number;
+  createdBy: number;
 
   get element() {
     return { id: this.elementId };

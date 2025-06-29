@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { Architect } from './architect.entity';
@@ -24,7 +25,7 @@ export class Element {
   provider: string;
 
   @Column({ type: 'date' })
-  buy_date: string;
+  buyDate: string;
 
   @ManyToOne(() => Category)
   category: Category;
@@ -32,9 +33,10 @@ export class Element {
   @ManyToOne(() => Architect)
   architect: Architect;
 
-  @OneToOne(() => Note)
-  note: Note;
+  @OneToOne(() => Note, { cascade: true })
+  @JoinColumn()
+  note: Note; // <- la clave foránea
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 }

@@ -10,15 +10,15 @@ export class ElementLocation {
   element: Element;
 
   @Column()
-  location_type: string;
+  locationType: string;
 
   @Column()
-  location_id: number;
+  locationId: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
+  updatedAt: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
 
 }

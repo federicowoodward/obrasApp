@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Element } from './element.entity';
-import { Architect } from './architect.entity';
 
 @Entity()
 export class Note {
@@ -13,18 +12,16 @@ export class Note {
   @Column()
   text: string;
 
-  @ManyToOne(() => Element)
-  element: Element;
-
-  @ManyToOne(() => Architect, { nullable: true }) // 👈 esta era la que faltaba
-  architect: Architect;
+  @Column()
+  createdBy: number;
 
   @Column()
-  created_by: number;
-
-  @Column()
-  created_by_type: string;
+  createdByType: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
+
+  // Relación inversa (opcional, no genera columna extra)
+  @OneToOne(() => Element, element => element.note)
+  element: Element;
 }

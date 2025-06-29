@@ -15,6 +15,7 @@ export class SeederService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
+    await this.resetTables();
     await this.seedPlanLimits();
     await this.seedCategories();
   }
@@ -26,31 +27,31 @@ export class SeederService implements OnApplicationBootstrap {
     await this.planLimitRepo.save([
       {
         name: 'Free',
-        max_elements: 10,
-        max_deposits: 1,
-        max_constructions: 1,
-        max_workers: 2,
+        maxElements: 10,
+        maxDeposits: 1,
+        maxConstructions: 1,
+        maxWorkers: 2,
       },
       {
         name: 'Starter',
-        max_elements: 50,
-        max_deposits: 3,
-        max_constructions: 2,
-        max_workers: 10,
+        maxElements: 50,
+        maxDeposits: 3,
+        maxConstructions: 2,
+        maxWorkers: 10,
       },
       {
         name: 'Pro',
-        max_elements: 200,
-        max_deposits: 10,
-        max_constructions: 10,
-        max_workers: 50,
+        maxElements: 200,
+        maxDeposits: 10,
+        maxConstructions: 10,
+        maxWorkers: 50,
       },
       {
         name: 'Enterprise',
-        max_elements: 1000,
-        max_deposits: 50,
-        max_constructions: 50,
-        max_workers: 500,
+        maxElements: 1000,
+        maxDeposits: 50,
+        maxConstructions: 50,
+        maxWorkers: 500,
       },
     ]);
   }
@@ -64,5 +65,10 @@ export class SeederService implements OnApplicationBootstrap {
       { name: 'Herramienta' },
       { name: 'Elemento de seguridad' },
     ]);
+  }
+
+  private async resetTables() {
+    await this.planLimitRepo.query(`TRUNCATE TABLE "plan_limit" RESTART IDENTITY CASCADE`);
+    await this.categoryRepo.query(`TRUNCATE TABLE "category" RESTART IDENTITY CASCADE`);
   }
 }
