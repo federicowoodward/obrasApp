@@ -50,7 +50,6 @@ export class ConstructionService {
   async findAllByArchitect(architectId: number) {
     return this.constructionRepo.find({
       where: { architect: { id: architectId } },
-      relations: ['construction_workers'],
     });
   }
 
@@ -65,10 +64,10 @@ export class ConstructionService {
         'Construcción no encontrada o no pertenece a este arquitecto',
       );
     }
-    
+
     // Borrado lógico de construcción
     await this.constructionRepo.remove(found);
-    
+
     // Logger
     const event = await this.logger.logEvent({
       table: 'construction',
@@ -78,7 +77,7 @@ export class ConstructionService {
       actorType: 'architect',
       oldData: found,
     });
-    
+
     // 📸 Snapshot automática
     await this.snapshotService.createSnapshot(event, found);
 
