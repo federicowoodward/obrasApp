@@ -15,17 +15,19 @@ export class SeederService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    await this.resetTables();
+    if (process.env.NODE_ENV === 'dev') {
+      // Opción para limpiar todo en entorno local si querés
+      // await this.resetTables();
+    }
+
     await this.seedPlanLimits();
     await this.seedCategories();
   }
 
   private async seedPlanLimits() {
-    const count = await this.planLimitRepo.count();
-    if (count > 0) return;
-
     await this.planLimitRepo.save([
       {
+        id: 1,
         name: 'Free',
         maxElements: 10,
         maxDeposits: 1,
@@ -33,6 +35,7 @@ export class SeederService implements OnApplicationBootstrap {
         maxWorkers: 2,
       },
       {
+        id: 2,
         name: 'Starter',
         maxElements: 50,
         maxDeposits: 3,
@@ -40,6 +43,7 @@ export class SeederService implements OnApplicationBootstrap {
         maxWorkers: 10,
       },
       {
+        id: 3,
         name: 'Pro',
         maxElements: 200,
         maxDeposits: 10,
@@ -47,6 +51,7 @@ export class SeederService implements OnApplicationBootstrap {
         maxWorkers: 50,
       },
       {
+        id: 4,
         name: 'Enterprise',
         maxElements: 1000,
         maxDeposits: 50,
@@ -57,18 +62,20 @@ export class SeederService implements OnApplicationBootstrap {
   }
 
   private async seedCategories() {
-    const count = await this.categoryRepo.count();
-    if (count > 0) return;
-
     await this.categoryRepo.save([
-      { name: 'Material' },
-      { name: 'Herramienta' },
-      { name: 'Elemento de seguridad' },
+      { id: 1, name: 'Material' },
+      { id: 2, name: 'Herramienta' },
+      { id: 3, name: 'Elemento de seguridad' },
     ]);
   }
 
+  // ⚠️ OPCIONAL: solo para reinicio total en dev
   private async resetTables() {
-    await this.planLimitRepo.query(`TRUNCATE TABLE "plan_limit" RESTART IDENTITY CASCADE`);
-    await this.categoryRepo.query(`TRUNCATE TABLE "category" RESTART IDENTITY CASCADE`);
+    await this.planLimitRepo.query(
+      `TRUNCATE TABLE "plan_limit" RESTART IDENTITY CASCADE`,
+    );
+    await this.categoryRepo.query(
+      `TRUNCATE TABLE "category" RESTART IDENTITY CASCADE`,
+    );
   }
 }
