@@ -17,7 +17,9 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ElementMoveModule } from './element-move/element-move.module';
-import { SharedModule } from './shared/init/seeder.module';
+import { SeederModule } from './shared/init/seeder.module';
+import { DbReadyLoggerService } from './shared/services/db-ready-logger/db-ready-logger.service';
+import { DevSeederModule } from './shared/init/dev-seeder.module';
 
 @Module({
   imports: [
@@ -36,7 +38,8 @@ import { SharedModule } from './shared/init/seeder.module';
     ElementLocationModule,
     ElementMoveModule,
     CategoryModule,
-    SharedModule,
+    SeederModule,
+    DevSeederModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     ConfigModule.forRoot({
       envFilePath: `.env`, // 🔥 lee .env.dev si NODE_ENV=development
@@ -45,6 +48,6 @@ import { SharedModule } from './shared/init/seeder.module';
     ElementMoveModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [DbReadyLoggerService],
 })
 export class AppModule {}

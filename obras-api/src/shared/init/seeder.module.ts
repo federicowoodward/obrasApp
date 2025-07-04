@@ -9,4 +9,4 @@ import { Category } from '../entities/category.entity';
   providers: [SeederService],
   exports: [SeederService],
 })
-export class SharedModule {}
+export class SeederModule {}
