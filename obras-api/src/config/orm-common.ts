@@ -13,6 +13,7 @@ export const ormConfig: DataSourceOptions = {
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   synchronize: true,
+  migrationsRun: true,
   schema: 'public',
   entities: [join(__dirname, '..', 'shared/entities', '*.entity.{ts,js}')],
   migrations: [join(__dirname, '..', 'migrations', '*.{ts,js}')],

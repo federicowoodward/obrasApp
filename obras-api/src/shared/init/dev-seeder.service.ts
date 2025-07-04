@@ -1,4 +1,4 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Architect } from '../entities/architect.entity';
@@ -12,6 +12,8 @@ import { Missing } from '../entities/missing.entity';
 
 @Injectable()
 export class DevSeederService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(DevSeederService.name);
+
   constructor(
     @InjectRepository(Architect)
     private architectRepo: Repository<Architect>,
@@ -32,16 +34,20 @@ export class DevSeederService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    if (process.env.NODE_ENV !== 'development') return;
-
-    await this.seedArchitect();
-    await this.seedConstruction();
-    await this.seedWorkers();
-    await this.seedDeposits();
-    await this.seedNotes();
-    await this.seedElements();
-    await this.seedElementLocations();
-    await this.seedMissings();
+    try {
+      this.logger.log('✅ Migraciones de DEV ejecutandose.');
+      await this.seedArchitect();
+      await this.seedConstruction();
+      await this.seedWorkers();
+      await this.seedDeposits();
+      await this.seedNotes();
+      await this.seedElements();
+      await this.seedElementLocations();
+      await this.seedMissings();
+      this.logger.log('✅ Migraciones dev ejecutadas.');
+    } catch (e) {
+      this.logger.error('❌ Fallaron las migraciones DEV:', e);
+    }
   }
 
   private async seedArchitect() {
