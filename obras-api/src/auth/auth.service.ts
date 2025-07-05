@@ -47,7 +47,6 @@ export class AuthService {
         user: {
           id: worker.id,
           name: worker.name,
-          constructionId: worker.construction?.id ?? null,
         },
       };
     }

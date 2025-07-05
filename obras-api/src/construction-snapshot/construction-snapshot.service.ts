@@ -26,10 +26,6 @@ export class ConstructionSnapshotService {
         title: construction.title,
         description: construction.description,
         createdAt: construction.createdAt,
-        workers: construction.constructionWorkers?.map((w) => ({
-          id: w.id,
-          name: w.name,
-        })),
       },
     });
 

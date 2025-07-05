@@ -34,7 +34,6 @@ export class ConstructionWorkerService {
       name: dto.name,
       password: hashedPassword,
       architect: { id: architectId },
-      construction: { id: dto.constructionId },
     });
 
     const saved = await this.workerRepo.save(worker);
@@ -84,9 +83,6 @@ export class ConstructionWorkerService {
 
     Object.assign(worker, {
       ...dto,
-      construction: dto.constructionId
-        ? { id: dto.constructionId }
-        : worker.construction,
     });
 
     const updated = await this.workerRepo.save(worker);

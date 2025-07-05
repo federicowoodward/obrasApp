@@ -3,11 +3,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Architect } from './architect.entity';
-import { Category } from './category.entity';
-import { Construction } from './construction.entity';
 
 @Entity()
 export class ConstructionWorker {
@@ -22,13 +19,6 @@ export class ConstructionWorker {
 
   @ManyToOne(() => Architect)
   architect: Architect;
-
-  @ManyToOne(
-    () => Construction,
-    (construction) => construction.constructionWorkers,
-  )
-  @JoinColumn({ name: 'constructionId' })
-  construction: Construction;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
