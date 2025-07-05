@@ -3,7 +3,6 @@ import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { Message } from 'primeng/message';
 import { Note } from '../../models/interfaces.model';
-import { MockDataService } from '../../services/mock-data.service';
 import { CommonModule } from '@angular/common';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -20,7 +19,7 @@ export class MissingMenu implements OnInit {
   notes = signal<Note[]>([]);
   animButton = true;
 
-  constructor(private mockData: MockDataService, private router: Router) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadNotes();
@@ -31,10 +30,6 @@ export class MissingMenu implements OnInit {
     if (cached) {
       this.notes.set(JSON.parse(cached) as Note[]);
     } else {
-      this.mockData.getNotes().subscribe((notes) => {
-        this.notes.set(notes);
-        localStorage.setItem('mock_notes', JSON.stringify(notes));
-      });
     }
   }
 
@@ -48,7 +43,8 @@ export class MissingMenu implements OnInit {
     let route = '';
     let fragment = '';
 
-    switch (note.type) {
+    switch (note.title) {
+      //esto probablemente esta mal
       case 'worker':
         route = '/workers';
         break;

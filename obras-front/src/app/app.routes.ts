@@ -5,11 +5,11 @@ import { Work } from './pages/work/work';
 import { Deposit } from './pages/deposit/deposit';
 import { Events } from './pages/events/events';
 import { Notes } from './pages/notes/notes';
-import { Workers } from './pages/workers/workers';
+import { ConstructionWorkers } from './pages/construction-workers/construction-workers';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
-  { path: 'workers', component: Workers },
+  { path: 'construction-workers', component: ConstructionWorkers },
   { path: 'works', component: Works },
   { path: 'work/:id', component: Work },
   { path: 'deposit', component: Deposit },

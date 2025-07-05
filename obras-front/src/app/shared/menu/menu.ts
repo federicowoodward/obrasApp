@@ -65,7 +65,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       {
         label: 'Trabajadores',
         icon: 'pi pi-users',
-        routerLink: ['workers'],
+        routerLink: ['construction-workers'],
         styleClass: this.isActive('workers') ? 'active' : '',
       },
       {

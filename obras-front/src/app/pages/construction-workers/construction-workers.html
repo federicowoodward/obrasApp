@@ -1,0 +1,89 @@
+<div class="flex flex-column gap-2 px-4 md:pt-4">
+  <div class="flex flex-column gap-2">
+    <h4>Agregar obrero</h4>
+    <form
+      class="flex flex-column gap-2 mb-3 w-20rem"
+      #workerForm="ngForm"
+      (ngSubmit)="createWorker(workerForm)"
+    >
+      <input
+        pInputText
+        type="text"
+        name="name"
+        ngModel
+        required
+        placeholder="Nombre"
+      />
+      <input
+        pInputText
+        type="text"
+        name="password"
+        ngModel
+        required
+        placeholder="Contraseña"
+      />
+      <button
+        type="submit"
+        pButton
+        label="Agregar"
+        [disabled]="workerForm.invalid"
+      ></button>
+    </form>
+  </div>
+
+  <div class="flex flex-column gap-2 w-screen overflow-x-scroll sm:w-30rem">
+    <h4>Administrar obreros</h4>
+    <p-table
+      [value]="workers()"
+      dataKey="id"
+      [tableStyle]="{ 'width': 'auto'}"
+      class=""
+      editMode="row"
+      (onRowEditSave)="updateWorker($event)"
+      (onRowEditCancel)="cancelEditWorker($event)"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 35%">Nombre</th>
+          <th style="width: 35%">Contraseña</th>
+          <th style="width: 20%">Creado</th>
+          <th style="width: 10%">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-worker let-editing="editing">
+        <tr [pEditableRow]="worker">
+          <td pEditableColumn>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="worker.name" />
+              </ng-template>
+              <ng-template pTemplate="output"> {{ worker.name }} </ng-template>
+            </p-cellEditor>
+          </td>
+          <td pEditableColumn>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="worker.password" />
+              </ng-template>
+              <ng-template pTemplate="output"
+                >{{ worker.password }}</ng-template
+              >
+            </p-cellEditor>
+          </td>
+          <td>{{ worker.createdAt | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-sm p-button-danger"
+              (click)="confirmDeleteWorker($event, worker.id)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <p-toast></p-toast>
+  <p-confirmpopup />
+</div>

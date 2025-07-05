@@ -1,80 +1,141 @@
+// interfaces.model.ts
 
-export class Note {
-    constructor(
-      public title: string,
-      public text: string,
-      public type: 'worker' | 'element' | 'material'
-    ) {}
-  }
-  
-  export class Missing {
-    constructor(
-      public title: string,
-      public text: string,
-      public work: number // workId
-    ) {}
-  }
-  
-  export class Material {
-    constructor(
-      public name: string,
-      public provider: string,
-      public buy_date: string,
-      public notes_related: number[] = []
-    ) {}
-  }
-  
-  export class Element {
-    constructor(
-      public name: string,
-      public brand: string,
-      public buy_date: string,
-      public photo: string,
-      public type: 'tool' | 'security_element',
-      public notes_related: number[] = []
-    ) {}
-  }
-  
-  export class Deposit {
-    constructor(
-      public elements: Element[] = [],
-      public materials: Material[] = []
-    ) {}
-  }
-  
-  export class Work {
-    constructor(
-      public id: number,
-      public title: string,
-      public desc: string,
-      public date_created: string,
-      public workers_related: number[] = [],
-      public elements_related: number[] = [],
-      public materials_related: number[] = [],
-      public missing_related: number[] = []
-    ) {}
-  }
-  
-  export class Worker {
-    constructor(
-      public name: string,
-      public password: string,
-      public works_related: number[] = [],
-      public notes_related: number[] = []
-    ) {}
-  }
-  
-  export class Architect {
-    constructor(
-      public name: string,
-      public password: string,
-      public email: string,
-      public payment_level: number,
-      public workers: Worker[] = [],
-      public works: Work[] = [],
-      public deposit: Deposit = new Deposit(),
-      public notes: Note[] = [],
-      public missings: Missing[] = []
-    ) {}
-  }
-  
+export interface Architect {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  payment_level: PlanLimit;
+  construction_workers: ConstructionWorker[];
+  constructions: Construction[];
+  elements: Element[];
+  deposits: Deposit[];
+  notes: Note[];
+  missings: Missing[];
+  created_at?: string;
+}
+
+export interface PlanLimit {
+  id: number;
+  name: string;
+  max_elements: number;
+  max_deposits: number;
+  max_constructions: number;
+  max_workers: number;
+  architects?: Architect[];
+  created_at?: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  elements?: Element[];
+  created_at?: string;
+}
+
+export interface Construction {
+  id: number;
+  title: string;
+  description: string;
+  architect: Architect;
+  deposit: Deposit | null;
+  elements: Element[];
+  notes: Note[];
+  missings: Missing[];
+  snapshots: ConstructionSnapshot[];
+  created_at?: string;
+}
+
+export interface ConstructionWorker {
+  id: number;
+  name: string;
+  architect: Architect;
+  elements: Element[];
+  created_at?: string;
+}
+
+export interface Deposit {
+  id: number;
+  name: string;
+  address: string;
+  architect: Architect;
+  elements: Element[];
+  created_at?: string;
+}
+
+export interface Element {
+  id: number;
+  name: string;
+  description: string;
+  quantity: number;
+  category: Category;
+  architect: Architect;
+  deposit: Deposit | null;
+  construction: Construction | null;
+  construction_worker: ConstructionWorker | null;
+  moves: ElementMoveDetail[];
+  element_location: ElementLocation | null;
+  notes: Note[];
+  missings: Missing[];
+  created_at?: string;
+}
+
+export interface ElementLocation {
+  id: number;
+  element: Element;
+  deposit: Deposit | null;
+  construction: Construction | null;
+  construction_worker: ConstructionWorker | null;
+  created_at?: string;
+}
+
+export interface ElementMoveDetail {
+  id: number;
+  element: Element;
+  from_deposit: Deposit | null;
+  to_deposit: Deposit | null;
+  from_construction: Construction | null;
+  to_construction: Construction | null;
+  from_construction_worker: ConstructionWorker | null;
+  to_construction_worker: ConstructionWorker | null;
+  quantity: number;
+  architect: Architect;
+  created_at?: string;
+}
+
+export interface EventsHistory {
+  id: number;
+  table: string;
+  action: string;
+  actorId: number;
+  actorType: string;
+  oldData: any;
+  newData: any;
+  created_at?: string;
+}
+
+export interface Note {
+  id: number;
+  title: string;
+  description: string;
+  element: Element | null;
+  construction: Construction | null;
+  architect: Architect;
+  created_at?: string;
+}
+
+export interface Missing {
+  id: number;
+  description: string;
+  element: Element | null;
+  construction: Construction | null;
+  architect: Architect;
+  created_at?: string;
+}
+
+export interface ConstructionSnapshot {
+  id: number;
+  construction: Construction;
+  data: any;
+  created_at?: string;
+}
