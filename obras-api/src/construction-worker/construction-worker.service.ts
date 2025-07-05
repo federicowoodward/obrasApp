@@ -53,14 +53,12 @@ export class ConstructionWorkerService {
   async findAll(architectId: number) {
     return await this.workerRepo.find({
       where: { architect: { id: architectId } },
-      relations: ['construction'],
     });
   }
 
   async findOne(architectId: number, id: number) {
     const worker = await this.workerRepo.findOne({
       where: { id, architect: { id: architectId } },
-      relations: ['construction'],
     });
 
     if (!worker) throw new NotFoundException('Obrero no encontrado');
