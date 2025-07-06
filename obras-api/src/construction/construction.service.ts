@@ -56,7 +56,6 @@ export class ConstructionService {
   async delete(id: number, architectId: number) {
     const found = await this.constructionRepo.findOne({
       where: { id, architect: { id: architectId } },
-      relations: ['construction_workers'], // si querés más info en el snapshot
     });
 
     if (!found) {
