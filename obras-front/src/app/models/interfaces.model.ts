@@ -43,7 +43,7 @@ export interface Construction {
   notes: Note[];
   missings: Missing[];
   snapshots: ConstructionSnapshot[];
-  created_at?: string;
+  createdAt?: string;
 }
 
 export interface ConstructionWorker {

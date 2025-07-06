@@ -1,0 +1,59 @@
+<p-toast></p-toast>
+<p-confirmpopup></p-confirmpopup>
+
+<div class="p-5 flex flex-column gap-3">
+  <h2>Obras</h2>
+
+  <form
+    [formGroup]="formGroup"
+    (ngSubmit)="createWork()"
+    class="flex flex-column gap-2 mb-3 w-20rem"
+  >
+    <input
+      pInputText
+      type="text"
+      formControlName="title"
+      required
+      placeholder="Título"
+    />
+    <input
+      pInputText
+      type="text"
+      formControlName="description"
+      required
+      placeholder="Descripción"
+    />
+    <button
+      type="submit"
+      pButton
+      label="Agregar"
+      [disabled]="formGroup.invalid"
+    ></button>
+  </form>
+
+  <div class="flex flex-column gap-2">
+    <div class="" *ngFor="let work of works()">
+      <p-card
+        [header]="work.title"
+        [subheader]="'Creada: ' + (work.createdAt | date:'dd/MM/yyyy')"
+      >
+        <p class="m-0">{{ work.description }}</p>
+        <ng-template #footer>
+          <div class="flex gap-3 mt-1 justify-content-between">
+            <button
+              pButton
+              label="Ver obra"
+              (click)="goToWork(work.id)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-danger"
+              (click)="confirmDeleteWork($event, work.id)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+</div>
