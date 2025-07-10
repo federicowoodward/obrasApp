@@ -1,0 +1,41 @@
+<div class="flex justify-content-center align-items-center h-screen">
+  <div class="w-23rem">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="p-2 flex flex-column gap-4"
+    >
+      <h2 class="text-center">Iniciar Sesión</h2>
+      <div class="flex flex-column gap-2">
+        <label for="emailOrName">Email o Usuario</label>
+        <input
+          id="emailOrName"
+          type="text"
+          pInputText
+          formControlName="emailOrName"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          pInputText
+          formControlName="password"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Ingresar"
+        [disabled]="form.invalid"
+        class="p-button-primary w-full"
+      ></button>
+    </form>
+    <p-toast></p-toast>
+  </div>
+</div>

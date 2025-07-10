@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -7,6 +7,7 @@ import { Menu } from 'primeng/menu';
 import { MenuService } from '../../services/menu.service';
 import { CommonModule } from '@angular/common';
 import { Drawer } from 'primeng/drawer';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-menu',
@@ -20,6 +21,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   responsiveMenu = false;
   private subs = new Subscription();
   private routerSub!: Subscription;
+  private authService = inject(AuthService);
 
   constructor(private router: Router, private menuService: MenuService) {}
 
@@ -94,6 +96,14 @@ export class MenuComponent implements OnInit, OnDestroy {
         icon: 'pi pi-book',
         routerLink: ['notes'],
         styleClass: this.isActive('notes') ? 'active' : '',
+      },
+      {
+        label: 'Salir',
+        icon: 'pi pi-sign-out',
+        command: () => {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
       },
     ];
   }

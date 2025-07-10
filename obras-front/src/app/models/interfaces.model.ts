@@ -37,12 +37,6 @@ export interface Construction {
   id: number;
   title: string;
   description: string;
-  architect: Architect;
-  deposit: Deposit | null;
-  elements: Element[];
-  notes: Note[];
-  missings: Missing[];
-  snapshots: ConstructionSnapshot[];
   createdAt?: string;
 }
 

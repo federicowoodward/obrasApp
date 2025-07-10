@@ -1,0 +1,31 @@
+<div class="p-4">
+  <button
+    pButton
+    type="button"
+    icon="pi pi-arrow-left"
+    label="Volver a la lista"
+    (click)="goBack()"
+    class="p-button-outlined p-button-sm mb-3"
+  ></button>
+
+  <p-card *ngIf="!loading && construction" [header]="'🛠️ Detalle de la obra'">
+    <div class="info">
+      <p><strong>ID de la obra:</strong> {{ construction.id }}</p>
+      <p><strong>Nombre:</strong> {{ construction.title }}</p>
+      <p><strong>Descripción:</strong> {{ construction.description }}</p>
+      <p>
+        <strong>Fecha de inicio:</strong> {{ construction.createdAt|
+        date:'dd/MM/yyyy'}}
+      </p>
+      <p><strong>Arquitecto:</strong> {{architect?.name}}</p>
+    </div>
+    <div class="acciones">
+      <!-- Acciones futuras -->
+    </div>
+  </p-card>
+
+  <p-card *ngIf="loading" header="Cargando...">
+    <p>Espere un momento...</p>
+  </p-card>
+</div>
+<p-toast></p-toast>

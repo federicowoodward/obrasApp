@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-construction-workers',
@@ -30,8 +31,9 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
   providers: [ConfirmationService, MessageService],
 })
 export class ConstructionWorkers {
+  private authService = inject(AuthService);
+  architect = this.authService.user();
   workers = signal<ConstructionWorker[]>([]);
-  architectId = 1; // reemplaza por tu lógica real
 
   constructor(
     private api: ApiService,
@@ -45,7 +47,7 @@ export class ConstructionWorkers {
 
   fetchWorkers() {
     this.api
-      .request('GET', `architect/${this.architectId}/construction-worker`)
+      .request('GET', `architect/${this.architect?.id}/construction-worker`)
       .subscribe((res) => {
         this.workers.set(res as ConstructionWorker[]);
       });
@@ -57,7 +59,7 @@ export class ConstructionWorkers {
     this.api
       .request(
         'POST',
-        `architect/${this.architectId}/construction-worker`,
+        `architect/${this.architect?.id}/construction-worker`,
         data
       )
       .subscribe({
@@ -74,7 +76,7 @@ export class ConstructionWorkers {
     this.api
       .request(
         'PUT',
-        `architect/${this.architectId}/construction-worker/${worker.id}`,
+        `architect/${this.architect?.id}/construction-worker/${worker.id}`,
         worker
       )
       .subscribe({
@@ -88,7 +90,7 @@ export class ConstructionWorkers {
     this.api
       .request(
         'DELETE',
-        `architect/${this.architectId}/construction-worker/${workerId}`
+        `architect/${this.architect?.id}/construction-worker/${workerId}`
       )
       .subscribe({
         next: () => this.fetchWorkers(),
@@ -114,7 +116,7 @@ export class ConstructionWorkers {
         this.api
           .request(
             'DELETE',
-            `architect/${this.architectId}/construction-worker/${workerId}`
+            `architect/${this.architect?.id}/construction-worker/${workerId}`
           )
           .subscribe({
             next: () => {

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, Inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../core/http/api';
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +15,7 @@ import {
 import { Construction } from '../../models/interfaces.model';
 import { CommonModule } from '@angular/common';
 import { InputText } from 'primeng/inputtext';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-constructions',
@@ -33,9 +34,10 @@ import { InputText } from 'primeng/inputtext';
   providers: [ConfirmationService, MessageService],
 })
 export class ConstructionComponent {
+  private authService = inject(AuthService);
   works = signal<Construction[]>([]);
-  architectId = 1; // reemplazar por auth real
   formGroup: FormGroup;
+  architect = this.authService.user(); // reemplazar por auth real
 
   constructor(
     private api: ApiService,
@@ -56,7 +58,7 @@ export class ConstructionComponent {
 
   fetchWorks() {
     this.api
-      .request('GET', `architect/${this.architectId}/construction`)
+      .request('GET', `architect/${this.architect?.id}/construction`)
       .subscribe((res) => this.works.set(res as Construction[]));
     console.log(this.works());
   }
@@ -66,7 +68,7 @@ export class ConstructionComponent {
     this.api
       .request(
         'POST',
-        `architect/${this.architectId}/construction`,
+        `architect/${this.architect?.id}/construction`,
         this.formGroup.value
       )
       .subscribe({
@@ -104,7 +106,10 @@ export class ConstructionComponent {
       },
       accept: () => {
         this.api
-          .request('DELETE', `architect/${this.architectId}/construction/${id}`)
+          .request(
+            'DELETE',
+            `architect/${this.architect?.id}/construction/${id}`
+          )
           .subscribe({
             next: () => {
               this.fetchWorks();

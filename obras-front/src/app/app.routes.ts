@@ -1,18 +1,34 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { ConstructionComponent } from './pages/construction/construction';
-import { Work } from './pages/work/work';
+import { ConstructionDetail } from './pages/construction-detail/construction-detail';
 import { Deposit } from './pages/deposit/deposit';
 import { Events } from './pages/events/events';
 import { Notes } from './pages/notes/notes';
 import { ConstructionWorkers } from './pages/construction-workers/construction-workers';
+import { LoginComponent } from './pages/login/login.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: Dashboard },
-  { path: 'construction-workers', component: ConstructionWorkers },
-  { path: 'constructions', component: ConstructionComponent },
-  { path: 'work/:id', component: Work },
-  { path: 'deposit', component: Deposit },
-  { path: 'events', component: Events },
-  { path: 'notes', component: Notes },
+  { path: 'login', component: LoginComponent },
+  { path: '', component: Dashboard, canActivate: [AuthGuard] },
+  {
+    path: 'construction-workers',
+    component: ConstructionWorkers,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'constructions',
+    component: ConstructionComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'construction/:id',
+    component: ConstructionDetail,
+    canActivate: [AuthGuard],
+  },
+  { path: 'deposit', component: Deposit, canActivate: [AuthGuard] },
+  { path: 'events', component: Events, canActivate: [AuthGuard] },
+  { path: 'notes', component: Notes, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '' },
 ];

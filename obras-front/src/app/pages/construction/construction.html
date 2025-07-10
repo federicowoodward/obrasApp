@@ -32,7 +32,7 @@
   </form>
 
   <div class="flex flex-column gap-2">
-    <div class="" *ngFor="let work of works()">
+    <div class="cursor-pointer" *ngFor="let work of works()">
       <p-card
         [header]="work.title"
         [subheader]="'Creada: ' + (work.createdAt | date:'dd/MM/yyyy')"
