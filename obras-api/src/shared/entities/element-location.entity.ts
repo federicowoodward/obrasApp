@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Element } from './element.entity';
 
 @Entity()
@@ -6,7 +12,8 @@ export class ElementLocation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Element)
+  @OneToOne(() => Element, (element) => element.location)
+  @JoinColumn()
   element: Element;
 
   @Column()
@@ -20,5 +27,4 @@ export class ElementLocation {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-
 }

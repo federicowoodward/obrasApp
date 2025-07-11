@@ -61,17 +61,15 @@ export interface Element {
   id: number;
   name: string;
   description: string;
+  brand: string;
+  provider: string;
   quantity: number;
+  buyDate: string;
   category: Category;
-  architect: Architect;
-  deposit: Deposit | null;
-  construction: Construction | null;
-  construction_worker: ConstructionWorker | null;
-  moves: ElementMoveDetail[];
-  element_location: ElementLocation | null;
-  notes: Note[];
-  missings: Missing[];
-  created_at?: string;
+  location?: Location;
+  architect: number;
+  note?: Note;
+  createdAt?: string;
 }
 
 export interface ElementLocation {
@@ -132,4 +130,12 @@ export interface ConstructionSnapshot {
   construction: Construction;
   data: any;
   created_at?: string;
+}
+
+export interface Location {
+  id: number;
+  createdAt: string;
+  locationId: number;
+  locationType: string;
+  updatedAt: string;
 }

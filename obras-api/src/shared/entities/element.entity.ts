@@ -9,13 +9,14 @@ import {
 import { Category } from './category.entity';
 import { Architect } from './architect.entity';
 import { Note } from './note.entity';
+import { ElementLocation } from './element-location.entity';
 
 @Entity()
 export class Element {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column() 
   name: string;
 
   @Column()
@@ -29,6 +30,9 @@ export class Element {
 
   @ManyToOne(() => Category)
   category: Category;
+
+  @OneToOne(() => ElementLocation, (location) => location.element)
+  location: ElementLocation;
 
   @ManyToOne(() => Architect)
   architect: Architect;

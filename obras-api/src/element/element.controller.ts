@@ -10,13 +10,7 @@ import {
 } from '@nestjs/common';
 import { ElementService } from './element.service';
 import { CreateElementDto } from './dto/create-element.dto';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Element')
 @Controller('architect/:architectId/element')

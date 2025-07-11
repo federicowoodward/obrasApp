@@ -7,12 +7,13 @@ import { Architect } from 'src/shared/entities/architect.entity';
 import { Element } from 'src/shared/entities/element.entity';
 import { EventsHistoryLoggerModule } from 'src/shared/services/events-history/events-history-logger.module';
 import { ElementLocationModule } from 'src/element-location/element-location.module';
+import { ElementLocation } from 'src/shared/entities/element-location.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Element, Category, Architect]),
+    TypeOrmModule.forFeature([Element, Category, Architect, ElementLocation]),
     EventsHistoryLoggerModule,
-    ElementLocationModule
+    ElementLocationModule,
   ],
   controllers: [ElementController],
   providers: [ElementService],

@@ -29,5 +29,10 @@ export class CreateElementDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  depositId: number;
+  locationId: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  locationType: string;
 }

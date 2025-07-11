@@ -8,7 +8,7 @@ import { Architect } from 'src/shared/entities/architect.entity';
 import { Category } from 'src/shared/entities/category.entity';
 import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
 import { ElementLocationService } from 'src/element-location/element-location.service';
-import { Deposit } from 'src/shared/entities/deposit.entity';
+import { ElementLocation } from 'src/shared/entities/element-location.entity';
 
 @Injectable()
 export class ElementService {
@@ -47,7 +47,7 @@ export class ElementService {
 
     await this.locationService.updateLocation(saved.id, {
       locationType: 'deposit',
-      locationId: dto.depositId,
+      locationId: dto.locationId,
     });
 
     await this.logger.logEvent({
@@ -65,7 +65,7 @@ export class ElementService {
   async findAll(architectId: number) {
     return this.elementRepo.find({
       where: { architect: { id: architectId } },
-      relations: ['category'],
+      relations: ['category', 'location'],
     });
   }
 
@@ -80,6 +80,11 @@ export class ElementService {
       where: { id: dto.categoryId },
     });
     if (!category) throw new NotFoundException('Categoría no encontrada');
+
+    await this.locationService.updateLocation(id, {
+      locationType: dto.locationType,
+      locationId: dto.locationId,
+    });
 
     const oldData = { ...existing };
 
