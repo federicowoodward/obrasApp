@@ -1,4 +1,12 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -16,44 +24,49 @@ import { AuthService } from '../../services/auth.service';
   imports: [Menu, CommonModule, Drawer],
 })
 export class MenuComponent implements OnInit, OnDestroy {
+  @Input() responsiveMenu: boolean = false;
+  @Output() closeMenu = new EventEmitter<void>();
+
   items: MenuItem[] = [];
   activePath: string = '';
-  responsiveMenu = false;
-  private subs = new Subscription();
-  private routerSub!: Subscription;
   private authService = inject(AuthService);
-
-  constructor(private router: Router, private menuService: MenuService) {}
+  private router = inject(Router);
+  private menuService = inject(MenuService);
+  private navSub!: Subscription;
+  private menuSub!: Subscription;
 
   ngOnInit() {
+    // Inicializo ítems según la ruta actual
     this.setItems(this.router.url);
 
-    this.routerSub = this.router.events
+    // Actualizo items y activa la clase según navegación
+    this.navSub = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.setItems(event.urlAfterRedirects);
+        // Siempre cerrar menú al navegar
+        this.menuService.close();
+        this.closeMenu.emit();
       });
 
-    this.subs.add(
-      this.router.events
-        .pipe(filter((event) => event instanceof NavigationEnd))
-        .subscribe((event: NavigationEnd) => {
-          this.setItems(event.urlAfterRedirects);
-        })
-    );
-
-    this.subs.add(
-      this.menuService.state$.subscribe((state) => {
-        this.responsiveMenu = state;
-      })
-    );
+    // Sincronizo estado del menuService → prop local
+    this.menuSub = this.menuService.state$.subscribe((state) => {
+      this.responsiveMenu = state;
+    });
   }
 
   ngOnDestroy() {
-    this.routerSub?.unsubscribe();
-    this.subs.unsubscribe();
+    this.navSub?.unsubscribe();
+    this.menuSub?.unsubscribe();
   }
 
+  // Cierra el menú tras la animación del Drawer
+  onDrawerHide() {
+    this.menuService.close();
+    this.closeMenu.emit();
+  }
+
+  // --- lógica del menú ---
   private setItems(currentPath: string) {
     this.activePath = currentPath;
 

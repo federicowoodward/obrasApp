@@ -1,8 +1,13 @@
 <div class="absolute md:hidden pt-1">
-  <p-drawer [(visible)]="responsiveMenu" position="left">
+  <p-drawer
+    [(visible)]="responsiveMenu"
+    position="left"
+    (onHide)="onDrawerHide()"
+  >
     <p-menu [model]="items"></p-menu>
   </p-drawer>
 </div>
+
 <div class="hidden md:block w-17rem">
   <p-menu [model]="items"></p-menu>
 </div>

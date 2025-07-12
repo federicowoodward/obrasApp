@@ -8,19 +8,15 @@ export class MenuService {
   toggle() {
     this.responsiveMenu$.next(!this.responsiveMenu$.value);
   }
-
   open() {
     this.responsiveMenu$.next(true);
   }
-
   close() {
     this.responsiveMenu$.next(false);
   }
-
   get state$() {
     return this.responsiveMenu$.asObservable();
   }
-
   get value() {
     return this.responsiveMenu$.value;
   }

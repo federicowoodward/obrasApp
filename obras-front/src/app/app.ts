@@ -14,22 +14,29 @@ import { CommonModule } from '@angular/common';
 })
 export class App {
   private router = inject(Router);
+  private menuService = inject(MenuService);
   private _currentUrl = signal(this.router.url);
+  protected title = 'obrasApp';
+  responsiveMenu = signal(this.menuService.value);
+  isLoginRoute = computed(() => this._currentUrl() === '/login');
 
-  constructor(private menuService: MenuService) {
+  constructor() {
     effect(() => {
       const sub = this.router.events.subscribe(() => {
         this._currentUrl.set(this.router.url);
       });
       return () => sub.unsubscribe();
     });
-  }
-  isLoginRoute = computed(() => this._currentUrl() === '/login');
 
-  protected title = 'obrasApp';
-  responsiveMenu = false;
+    effect(() => {
+      const sub = this.menuService.state$.subscribe((open) => {
+        this.responsiveMenu.set(open);
+      });
+      return () => sub.unsubscribe();
+    });
+  }
 
   toggleMenu() {
-    this.menuService.toggle();
+    if (!this.responsiveMenu()) this.menuService.open();
   }
 }

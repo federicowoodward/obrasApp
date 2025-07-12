@@ -7,7 +7,7 @@
     <p-button (click)="toggleMenu()" icon="pi pi-bars" />
   </div>
   <div class="flex pt-8 md:pt-0 relative">
-    <app-menu></app-menu>
+    <app-menu [responsiveMenu]="responsiveMenu()" (closeMenu)="responsiveMenu.set(false)"></app-menu>
     <router-outlet></router-outlet>
     <app-missing-menu></app-missing-menu>
   </div>
