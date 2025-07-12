@@ -2,6 +2,7 @@
   <p-drawer
     [(visible)]="responsiveMenu"
     position="left"
+    [styleClass]="'w-auto'"
     (onHide)="onDrawerHide()"
   >
     <p-menu [model]="items"></p-menu>

@@ -1,9 +1,10 @@
 ::ng-deep {
   .p-menu {
     height: 90 !important;
-    --p-menu-item-padding: 1.2rem 1.7rem;
+    width: 220px !important;
+    --p-menu-item-padding: 0.8rem 1rem;
     span {
-      font-size: 1.2rem;
+      font-size: 0.8rem;
     }
     .active {
       background: var(--p-menu-item-focus-background);
@@ -11,10 +12,11 @@
         border: 1px solid #eab308;
       }
     }
+    li {
+      width: auto;
+    }
     .p-menu-item-content {
       border: 1px solid transparent;
     }
   }
 }
-
-
