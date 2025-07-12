@@ -1,36 +1,17 @@
 <p-toast></p-toast>
 <p-confirmpopup></p-confirmpopup>
 
-<div class="p-5 flex flex-column gap-3">
-  <h2>Obras</h2>
-
-  <form
-    [formGroup]="formGroup"
-    (ngSubmit)="createWork()"
-    class="flex flex-column gap-2 mb-3 w-20rem"
-  >
-    <input
-      pInputText
-      type="text"
-      formControlName="title"
-      required
-      placeholder="Título"
-    />
-    <input
-      pInputText
-      type="text"
-      formControlName="description"
-      required
-      placeholder="Descripción"
-    />
+<div class="flex flex-column gap-3 p-4 w-screen sm:w-30rem">
+  <div class="flex flex-column sm:flex-row gap-2 justify-content-between">
+    <h2>Obras</h2>
     <button
-      type="submit"
       pButton
-      label="Agregar"
-      [disabled]="formGroup.invalid"
+      label="Agregar obra"
+      icon="pi pi-plus"
+      (click)="displayAddDialog = true"
+      class="mb-3 w-15rem"
     ></button>
-  </form>
-
+  </div>
   <div class="flex flex-column gap-2">
     <div class="cursor-pointer" *ngFor="let work of works()">
       <p-card
@@ -57,3 +38,48 @@
     </div>
   </div>
 </div>
+<p-dialog
+  [(visible)]="displayAddDialog"
+  header="Agregar obra"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  (onHide)="formGroup.reset()"
+  styleClass="p-3"
+>
+  <form
+    [formGroup]="formGroup"
+    (ngSubmit)="createWork(); displayAddDialog = false"
+    class="flex flex-column gap-2 w-20rem"
+  >
+    <input
+      pInputText
+      type="text"
+      formControlName="title"
+      required
+      placeholder="Título"
+    />
+    <input
+      pInputText
+      type="text"
+      formControlName="description"
+      required
+      placeholder="Descripción"
+    />
+    <div class="flex justify-content-end gap-2 mt-2">
+      <button
+        type="button"
+        pButton
+        label="Cancelar"
+        class="p-button-text"
+        (click)="displayAddDialog = false; formGroup.reset()"
+      ></button>
+      <button
+        type="submit"
+        pButton
+        label="Agregar"
+        [disabled]="formGroup.invalid"
+      ></button>
+    </div>
+  </form>
+</p-dialog>

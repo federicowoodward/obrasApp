@@ -16,6 +16,7 @@ import { Construction } from '../../models/interfaces.model';
 import { CommonModule } from '@angular/common';
 import { InputText } from 'primeng/inputtext';
 import { AuthService } from '../../services/auth.service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-constructions',
@@ -28,6 +29,7 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     InputText,
     ReactiveFormsModule,
+    DialogModule,
   ],
   templateUrl: './construction.html',
   styleUrl: './construction.scss',
@@ -38,6 +40,7 @@ export class ConstructionComponent {
   works = signal<Construction[]>([]);
   formGroup: FormGroup;
   architect = this.authService.user(); // reemplazar por auth real
+  displayAddDialog = false;
 
   constructor(
     private api: ApiService,
