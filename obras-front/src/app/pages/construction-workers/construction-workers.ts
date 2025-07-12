@@ -11,6 +11,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { AuthService } from '../../services/auth.service';
+import { DialogModule } from 'primeng/dialog';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-construction-workers',
@@ -25,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
     ButtonModule,
     ConfirmPopupModule,
     ToastModule,
+    DialogModule,
   ],
   templateUrl: './construction-workers.html',
   styleUrl: './construction-workers.scss',
@@ -34,12 +37,20 @@ export class ConstructionWorkers {
   private authService = inject(AuthService);
   architect = this.authService.user();
   workers = signal<ConstructionWorker[]>([]);
+  displayAddDialog = false;
+  addWorkerForm: FormGroup;
 
   constructor(
     private api: ApiService,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private fb: FormBuilder
+  ) {
+    this.addWorkerForm = this.fb.group({
+      name: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+  }
 
   ngOnInit() {
     this.fetchWorkers();
@@ -53,21 +64,34 @@ export class ConstructionWorkers {
       });
   }
 
-  createWorker(form: any) {
-    if (form.invalid) return;
-    const data = form.value;
+  onSubmitAddWorker() {
+    if (this.addWorkerForm.invalid) return;
     this.api
       .request(
         'POST',
         `architect/${this.architect?.id}/construction-worker`,
-        data
+        this.addWorkerForm.value
       )
       .subscribe({
         next: () => {
-          form.resetForm();
+          this.addWorkerForm.reset();
+          this.displayAddDialog = false;
           this.fetchWorkers();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Obrero creado',
+            detail: 'El obrero fue creado correctamente',
+            life: 2500,
+          });
         },
-        error: () => alert('Error al crear obrero'),
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo crear el obrero',
+            life: 2500,
+          });
+        },
       });
   }
 

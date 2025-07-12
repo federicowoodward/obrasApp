@@ -1,38 +1,15 @@
 <div class="flex flex-column gap-2 px-4 md:pt-4">
-  <div class="flex flex-column gap-2">
-    <h4>Agregar obrero</h4>
-    <form
-      class="flex flex-column gap-2 mb-3 w-20rem"
-      #workerForm="ngForm"
-      (ngSubmit)="createWorker(workerForm)"
-    >
-      <input
-        pInputText
-        type="text"
-        name="name"
-        ngModel
-        required
-        placeholder="Nombre"
-      />
-      <input
-        pInputText
-        type="text"
-        name="password"
-        ngModel
-        required
-        placeholder="Contraseña"
-      />
-      <button
-        type="submit"
-        pButton
-        label="Agregar"
-        [disabled]="workerForm.invalid"
-      ></button>
-    </form>
-  </div>
-
   <div class="flex flex-column gap-2 w-screen overflow-x-scroll sm:w-30rem">
-    <h4>Administrar obreros</h4>
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-between">
+      <h4>Administrar obreros</h4>
+      <button
+        pButton
+        label="Agregar obrero"
+        icon="pi pi-plus"
+        class="w-12rem mb-2"
+        (click)="displayAddDialog = true"
+      ></button>
+    </div>
     <p-table
       [value]="workers()"
       dataKey="id"
@@ -87,3 +64,48 @@
   <p-toast></p-toast>
   <p-confirmpopup />
 </div>
+<p-dialog
+  [(visible)]="displayAddDialog"
+  header="Agregar obrero"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  (onHide)="addWorkerForm.reset()"
+  styleClass="p-3"
+>
+  <form
+    [formGroup]="addWorkerForm"
+    (ngSubmit)="onSubmitAddWorker()"
+    class="flex flex-column gap-2 mb-3 w-20rem"
+  >
+    <input
+      pInputText
+      type="text"
+      formControlName="name"
+      required
+      placeholder="Nombre"
+    />
+    <input
+      pInputText
+      type="text"
+      formControlName="password"
+      required
+      placeholder="Contraseña"
+    />
+    <div class="flex justify-content-end gap-2 mt-2">
+      <button
+        type="button"
+        pButton
+        label="Cancelar"
+        class="p-button-text"
+        (click)="displayAddDialog = false; addWorkerForm.reset()"
+      ></button>
+      <button
+        type="submit"
+        pButton
+        label="Agregar"
+        [disabled]="addWorkerForm.invalid"
+      ></button>
+    </div>
+  </form>
+</p-dialog>
