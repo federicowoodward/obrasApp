@@ -26,5 +26,15 @@ services:
     env_file:
       - obras-api/.env.prod
 
+  front:
+    build:
+      context: ./obras-front
+      dockerfile: Dockerfile
+    container_name: obras-front
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
