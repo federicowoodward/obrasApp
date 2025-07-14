@@ -1,0 +1,58 @@
+<div class="p-4">
+  <button
+    pButton
+    type="button"
+    icon="pi pi-arrow-left"
+    label="Volver a la lista"
+    (click)="goBack()"
+    class="p-button-outlined p-button-sm mb-3"
+  ></button>
+  <p-card *ngIf="event() as ev" header="Detalle de Evento" class="mb-4">
+    <div class="flex flex-column gap-3 p-3">
+      <div><b>Acción:</b> {{ ev.action }}</div>
+      <div><b>Fecha:</b> {{ ev.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+      <div><b>Tipo de registro:</b> {{ getBetterTableName(ev.tableName) }}</div>
+      <div><b>ID registro:</b> {{ ev.recordId }}</div>
+      <div>
+        <b>Usuario:</b>
+        {{ ev.changedByUser?.name }} ({{ getBetterTypeName(ev.changedByType) }})
+        <span *ngIf="ev.changedByUser?.email"
+          >- {{ ev.changedByUser.email }}</span
+        >
+      </div>
+      <!-- <div class="flex flex-column sm:flex-row gap-6">
+        <div>
+          <b>Datos Anteriores:</b>
+          <ng-container
+            *ngIf="parseAndFilter(ev.oldData) as oldData; else noOld"
+          >
+            <table class="p-2 surface-100 border-round w-full">
+              <tr *ngFor="let key of (oldData | keyvalue)">
+                <td><b>{{ key.key }}</b></td>
+                <td>{{ key.value }}</td>
+              </tr>
+            </table>
+          </ng-container>
+          <ng-template #noOld><span>-</span></ng-template>
+        </div>
+        <div>
+          <b>Datos Nuevos:</b>
+          <ng-container
+            *ngIf="parseAndFilter(ev.newData) as newData; else noNew"
+          >
+            <table class="p-2 surface-100 border-round w-full">
+              <tr *ngFor="let key of (newData | keyvalue)">
+                <td><b>{{ key.key }}</b></td>
+                <td>{{ log(key.value) }}</td>
+              </tr>
+            </table>
+          </ng-container>
+          <ng-template #noNew><span>-</span></ng-template>
+        </div>
+      </div> -->
+    </div>
+  </p-card>
+</div>
+<div *ngIf="!event()">
+  <p class="p-3 text-danger">Evento no encontrado.</p>
+</div>

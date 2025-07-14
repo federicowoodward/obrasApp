@@ -8,6 +8,7 @@ import { Notes } from './pages/notes/notes';
 import { ConstructionWorkers } from './pages/construction-workers/construction-workers';
 import { LoginComponent } from './pages/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
+import { EventDetail } from './pages/event-detail/event-detail';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -29,6 +30,7 @@ export const routes: Routes = [
   },
   { path: 'deposit', component: Deposit, canActivate: [AuthGuard] },
   { path: 'events', component: Events, canActivate: [AuthGuard] },
+  { path: 'event/:id', component: EventDetail, canActivate: [AuthGuard]},
   { path: 'notes', component: Notes, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];

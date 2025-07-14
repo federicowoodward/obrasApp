@@ -4,13 +4,12 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  // más campos si necesitás
 }
 
 const LS_USER = 'auth_user';
 const LS_ROLE = 'auth_role';
 const LS_TIMESTAMP = 'auth_time';
-const MAX_SESSION_MS = 60 * 60 * 1000; // 1 hora en milisegundos
+const MAX_SESSION_MS = 60 * 60 * 1000; 
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +19,6 @@ export class AuthService {
   role = signal<string | null>(null);
 
   constructor() {
-    // Al iniciar, chequea localStorage y expira si es necesario
     const userStr = localStorage.getItem(LS_USER);
     const role = localStorage.getItem(LS_ROLE);
     const time = localStorage.getItem(LS_TIMESTAMP);
@@ -31,7 +29,7 @@ export class AuthService {
         this.user.set(JSON.parse(userStr));
         this.role.set(role);
       } else {
-        this.logout(); // Expirado
+        this.logout(); 
       }
     }
   }

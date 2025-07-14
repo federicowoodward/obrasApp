@@ -109,11 +109,11 @@ export interface EventsHistory {
 export interface Note {
   id: number;
   title: string;
-  description: string;
-  element: Element | null;
-  construction: Construction | null;
-  architect: Architect;
-  created_at?: string;
+  text: string;
+  createdBy: number;
+  createdByType: string;
+  createdAt: string;
+  element?: any;
 }
 
 export interface Missing {

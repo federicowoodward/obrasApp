@@ -1,1 +1,48 @@
-<p>notes works!</p>
+<p-toast></p-toast>
+<div class="p-4">
+  <div class="flex justify-between align-items-center mb-3">
+    <h2 class="pb-2">Notas de elementos</h2>
+    <button
+      pButton
+      label="Agregar nota"
+      icon="pi pi-plus"
+      (click)="openAddDialog()"
+    ></button>
+  </div>
+  <div class="notes-list flex flex-wrap gap-3">
+    <p-card *ngFor="let note of notes()" class="note-card">
+      <div class="flex flex-column gap-2">
+        <div class="text-xs text-secondary mb-2">
+          <b>Creada:</b> {{ note.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          <span *ngIf="note.createdByType">
+            | <b>Por:</b> {{ note.createdByType }}</span
+          >
+        </div>
+        <h3 class="mb-1">{{ note.title }}</h3>
+        <div class="note-content">{{ note.text }}</div>
+        <div class="flex gap-2 mt-2">
+          <button
+            pButton
+            icon="pi pi-pencil"
+            (click)="openEditDialog(note)"
+            label="Editar"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            (click)="confirmDelete($event, note)"
+            severity="danger"
+            label="Eliminar"
+          ></button>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
+<p-confirmPopup></p-confirmPopup>
+<note-edit-dialog
+  [visible]="editDialogVisible"
+  [note]="noteToEdit"
+  (save)="onSaveNote($event)"
+  (cancel)="editDialogVisible = false"
+></note-edit-dialog>
