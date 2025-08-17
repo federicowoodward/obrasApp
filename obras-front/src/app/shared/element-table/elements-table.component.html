@@ -4,7 +4,7 @@
   <div class="flex flex-row gap-2">
     <div class="flex items-center gap-2">
       <p-iftalabel>
-        <label for="categories">Categorias: </label>
+        <label for="categories">Categorías: </label>
         <select
           class="p-inputtext"
           id="categories"
@@ -19,6 +19,7 @@
       </p-iftalabel>
     </div>
   </div>
+
   <button
     pButton
     type="button"
@@ -28,6 +29,7 @@
     (click)="openAddDialog()"
   ></button>
 </div>
+
 <div class="w-full">
   <p-table
     #dt
@@ -36,89 +38,134 @@
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"
     [paginator]="true"
-    [globalFilterFields]="['name', 'brand', 'provider', 'category.name']"
-    [loading]="false"
-    [style]="{ 'min-width': '60rem' }"
-    class="mx-auto"
+    [globalFilterFields]="['name', 'category.name']"
+    responsiveLayout="scroll"
   >
+    <!-- Caption: buscador global -->
     <ng-template pTemplate="caption">
-      <div class="flex justify-end">
+      <div class="flex justify-content-end">
         <span class="p-input-icon-left">
           <input
             pInputText
             type="text"
             (input)="onGlobalFilter($event, dt)"
-            placeholder="Buscar..."
+            placeholder="Buscar por nombre o categoría..."
+            class="w-20rem"
           />
         </span>
       </div>
     </ng-template>
+
+    <!-- Encabezado: vista simple -->
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="name">
-          Nombre <p-sortIcon field="name"></p-sortIcon>
-        </th>
-        <th pSortableColumn="brand">
-          Marca <p-sortIcon field="brand"></p-sortIcon>
-        </th>
-        <th pSortableColumn="provider">
-          Proveedor <p-sortIcon field="provider"></p-sortIcon>
-        </th>
-        <th pSortableColumn="buyDate" class="text-center">
-          Fecha compra <p-sortIcon field="buyDate"></p-sortIcon>
-        </th>
-        <th pSortableColumn="category.name">
-          Categoría <p-sortIcon field="category.name"></p-sortIcon>
-        </th>
-        <th>Ubicacion</th>
-        <th>Acciones</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Ubicación</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-element>
+
+    <ng-template pTemplate="body" let-el let-expanded="expanded">
       <tr>
-        <td>{{ element.name }}</td>
-        <td>{{ element.brand }}</td>
-        <td>{{ element.provider }}</td>
-        <td>{{ element.buyDate | date : "yyyy-MM-dd" }}</td>
-        <td>{{ element.category?.name }}</td>
+        <td class="flex align-items-center gap-2">
+          <button
+            pButton
+            [pRowToggler]="el"
+            type="button"
+            [text]="true"
+            class="mr-2"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            pTooltip="Ver más"
+            tooltipPosition="bottom"
+          ></button>
+          <span class="font-medium">{{ el.name }}</span>
+        </td>
+        <td>{{ el.category?.name || "-" }}</td>
         <td>
           {{
-            getLocationName(
-              element.location.locationId,
-              element.location.locationType
-            )
+            getLocationName(el.location?.locationId, el.location?.locationType)
           }}
-        </td>
-        <td class="flex gap-2">
-          <button
-            pButton
-            icon="pi pi-pencil"
-            class="p-button-sm p-mr-2"
-            (click)="openEditDialog(element)"
-            label=""
-          ></button>
-          <button
-            pButton
-            icon="pi pi-trash"
-            class="p-button-sm p-button-danger"
-            (click)="confirmDeleteElement($event, element.id)"
-            label=""
-          ></button>
         </td>
       </tr>
     </ng-template>
+
+    <ng-template #expandedrow let-el>
+      <tr>
+        <td colspan="3">
+          <div
+            class="flex flex-column md:flex-row justify-content-between py-3"
+          >
+            <div class="flex flex-column">
+              <span class="text-sm text-color-secondary">Marca</span>
+              <span class="font-medium">{{ el.brand || "-" }}</span>
+            </div>
+            <div class="flex flex-column">
+              <span class="text-sm text-color-secondary">Proveedor</span>
+              <span class="font-medium">{{ el.provider || "-" }}</span>
+            </div>
+            <div class="flex flex-column">
+              <span class="text-sm text-color-secondary">Fecha de compra</span>
+              <span class="font-medium">
+                {{ el.buyDate ? (el.buyDate | date : "yyyy-MM-dd") : "-" }}
+              </span>
+            </div>
+
+            <div class="flex gap-2 align-items-start md:align-items-center">
+              <ng-container
+                *ngIf="noteId$(el.id) | async as noteId; else createNoteBtn"
+              >
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  label="Ver nota"
+                  outlined
+                  (click)="notesSvc.openEditorById(el.id!, router.url)"
+                ></button>
+              </ng-container>
+
+              <ng-template #createNoteBtn>
+                <button
+                  pButton
+                  icon="pi pi-plus"
+                  label="Crear nota"
+                  outlined
+                  (click)="notesSvc.openNewForElement(el.id, router.url)"
+                ></button>
+              </ng-template>
+
+              <button
+                pButton
+                icon="pi pi-pencil"
+                label="Editar elemento"
+                (click)="openEditDialog(el)"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                label="Eliminar elemento"
+                severity="danger"
+                (click)="confirmDeleteElement($event, el.id)"
+              ></button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7">No se encontraron elementos.</td>
+        <td colspan="3">No se encontraron elementos.</td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
+<!-- Dialogo de alta/edición -->
 <p-dialog
   [(visible)]="displayDialog"
   modal
   [closable]="false"
+  [style]="{ width: '640px', maxWidth: '95vw' }"
   header="{{ isNew() ? 'Agregar Elemento' : 'Editar Elemento' }}"
   styleClass="p-3"
 >
@@ -127,99 +174,96 @@
       <div class="p-field">
         <p-iftalabel>
           <label for="name">Nombre*</label>
-          <input
-            pInputText
-            id="name"
-            formControlName="name"
-            autocomplete="off"
-            class="w-full"
-          />
-          <div
-            *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
-            class="p-error"
-          ></div>
+          <input pInputText id="name" formControlName="name" class="w-full" />
         </p-iftalabel>
       </div>
-      <div class="p-field">
-        <p-iftalabel>
-          <label for="brand">Marca*</label>
-          <input
-            pInputText
-            id="brand"
-            formControlName="brand"
-            autocomplete="off"
-            class="w-full"
-          />
-        </p-iftalabel>
+
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <p-iftalabel>
+            <label for="categoryId">Categoría*</label>
+            <select
+              pInputText
+              id="categoryId"
+              formControlName="categoryId"
+              class="w-full"
+            >
+              <option [value]="null" disabled selected>
+                Seleccioná una categoría
+              </option>
+              <option *ngFor="let cat of categories()" [value]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </p-iftalabel>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <p-iftalabel>
+            <label for="locationId">Ubicación*</label>
+            <select
+              pInputText
+              id="locationId"
+              formControlName="locationId"
+              class="w-full"
+              (change)="onLocationChange($event)"
+            >
+              <option *ngFor="let loc of locations()" [value]="loc.id">
+                {{ loc.name }} ({{
+                  loc.type === "deposit" ? "Depósito" : "Obra"
+                }})
+              </option>
+            </select>
+          </p-iftalabel>
+        </div>
       </div>
-      <div class="p-field">
-        <p-iftalabel>
-          <label for="provider">Proveedor*</label>
-          <input
-            pInputText
-            id="provider"
-            formControlName="provider"
-            autocomplete="off"
-            class="w-full"
-          />
-        </p-iftalabel>
-      </div>
-      <div class="p-field">
-        <p-iftalabel>
-          <label for="buyDate">Fecha de Compra*</label>
-          <input
-            pInputText
-            type="date"
-            id="buyDate"
-            class="w-full"
-            formControlName="buyDate"
-          />
-        </p-iftalabel>
-      </div>
-      <div class="p-field">
-        <p-iftalabel>
-          <label for="categoryId">Categoría*</label>
-          <select
-            pInputText
-            id="categoryId"
-            formControlName="categoryId"
-            class="w-full"
-          >
-            <option [value]="null" disabled selected>
-              Seleccioná una categoría
-            </option>
-            <option *ngFor="let cat of categories()" [value]="cat.id">
-              {{ cat.name }}
-            </option>
-          </select>
-        </p-iftalabel>
-      </div>
-      <div class="p-field">
-        <p-iftalabel>
-          <label for="locationId">Ubicacion*</label>
-          <select
-            pInputText
-            id="locationId"
-            formControlName="locationId"
-            class="w-full"
-            (change)="onLocationChange($event)"
-          >
-            <option *ngFor="let loc of locations()" [value]="loc.id">
-              {{ loc.name }} ({{
-                loc.type === "deposit" ? "Depósito" : "Obra"
-              }})
-            </option>
-          </select>
-        </p-iftalabel>
+
+      <div class="grid">
+        <div class="col-12 md:col-4">
+          <p-iftalabel>
+            <label for="brand">Marca*</label>
+            <input
+              pInputText
+              id="brand"
+              formControlName="brand"
+              class="w-full"
+            />
+          </p-iftalabel>
+        </div>
+
+        <div class="col-12 md:col-4">
+          <p-iftalabel>
+            <label for="provider">Proveedor*</label>
+            <input
+              pInputText
+              id="provider"
+              formControlName="provider"
+              class="w-full"
+            />
+          </p-iftalabel>
+        </div>
+
+        <div class="col-12 md:col-4">
+          <p-iftalabel>
+            <label for="buyDate">Fecha de Compra*</label>
+            <input
+              pInputText
+              type="date"
+              id="buyDate"
+              formControlName="buyDate"
+              class="w-full"
+            />
+          </p-iftalabel>
+        </div>
       </div>
     </div>
-    <div class="flex justify-content-end mt-4">
+
+    <div class="flex justify-content-end mt-4 gap-2">
       <button
         pButton
         label="Cancelar"
-        class="p-button-text p-mr-2"
+        class="p-button-text"
         type="button"
-        size="small"
         (click)="cancelDialog()"
       ></button>
       <button
@@ -231,4 +275,5 @@
     </div>
   </form>
 </p-dialog>
+
 <p-confirmpopup />

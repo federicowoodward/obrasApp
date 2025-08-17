@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 import { Element } from './element.entity';
 
 @Entity()
@@ -21,7 +21,6 @@ export class Note {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  // Relación inversa (opcional, no genera columna extra)
-  @OneToOne(() => Element, element => element.note)
+  @OneToOne(() => Element, (element) => element.note)
   element: Element;
 }

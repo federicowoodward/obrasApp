@@ -1,0 +1,57 @@
+<p-toast></p-toast>
+
+<div class="p-4">
+  <h2 class="mb-3">{{ headerTitle }}</h2>
+
+  <form [formGroup]="form" class="flex flex-column gap-3" (ngSubmit)="save()">
+    <p-iftalabel>
+      <label for="title">Título</label>
+      <input id="title" pInputText formControlName="title" autocomplete="off" />
+    </p-iftalabel>
+
+    <p-iftalabel>
+      <label for="text">Contenido</label>
+      <textarea
+        id="text"
+        pInputTextarea
+        rows="8"
+        formControlName="text"
+        autocomplete="off"
+      ></textarea>
+    </p-iftalabel>
+
+    <div class="flex gap-2 align-items-center">
+      <button
+        pButton
+        type="button"
+        label="Volver"
+        class="p-button-text"
+        (click)="navigateBack()"
+        [disabled]="busy"
+      ></button>
+
+      <span class="flex-1"></span>
+
+      <button
+        *ngIf="mode === 'edit'"
+        pButton
+        type="button"
+        icon="pi pi-trash"
+        label="Eliminar"
+        severity="danger"
+        (click)="confirmDelete($event)"
+        [disabled]="busy"
+      ></button>
+
+      <button
+        pButton
+        type="submit"
+        icon="pi pi-save"
+        [label]="mode === 'edit' ? 'Guardar' : 'Crear'"
+        [disabled]="form.invalid || busy"
+      ></button>
+    </div>
+  </form>
+</div>
+
+<p-confirmPopup></p-confirmPopup>

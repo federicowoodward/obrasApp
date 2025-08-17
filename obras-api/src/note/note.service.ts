@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from 'src/shared/entities/note.entity';
+import { Element } from 'src/shared/entities/element.entity';
 import { Repository } from 'typeorm';
 import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -10,8 +11,10 @@ import { DeleteNoteDto } from './dto/delete-note.dto';
 @Injectable()
 export class NoteService {
   constructor(
-    @InjectRepository(Note)
+    @InjectRepository(Note) 
     private readonly noteRepo: Repository<Note>,
+    @InjectRepository(Element)
+    private readonly elementRepo: Repository<Element>,
 
     private readonly logger: EventsHistoryLoggerService,
   ) {}
@@ -71,8 +74,18 @@ export class NoteService {
     const note = await this.noteRepo.findOne({ where: { id } });
     if (!note) throw new NotFoundException('Nota no encontrada');
 
+    // 1) Desasociar por si el FK todavía no tiene ON DELETE SET NULL
+    await this.elementRepo
+      .createQueryBuilder()
+      .update(Element)
+      .set({ note: null })
+      .where('note_id = :id', { id })
+      .execute();
+
+    // 2) Borrar la nota
     await this.noteRepo.remove(note);
 
+    // 3) Log
     await this.logger.logEvent({
       table: 'note',
       recordId: note.id,

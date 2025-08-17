@@ -1,12 +1,11 @@
-<div class="absolute -rotate-90 custom-pos">
-  <p-button
-    type="button"
-    label="Faltantes ({{notes().length}})"
-    (click)="openDrawer()"
-    icon="pi pi-arrow-up"
-    styleClass="glow-pulse"
-  />
-</div>
+<p-button
+  type="button"
+  label="Faltantes ({{notes().length}})"
+  (click)="openDrawer()"
+  styleClass="glow-pulse"
+  variant="outlined"
+  [disabled]="notes().length === 0"
+/>
 <p-drawer
   header="Faltantes ({{notes().length}})"
   [(visible)]="visible"

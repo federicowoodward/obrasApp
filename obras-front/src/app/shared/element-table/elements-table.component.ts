@@ -18,6 +18,11 @@ import { Element } from '../../models/interfaces.model';
 import { ApiService } from '../../core/http/api';
 import { AuthService } from '../../services/auth.service';
 import { IftaLabel } from 'primeng/iftalabel';
+import { NotesService } from '../../services/notes.service';
+import { Router } from '@angular/router';
+import { take } from 'rxjs/internal/operators/take';
+import { shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-elements-table',
@@ -40,9 +45,36 @@ import { IftaLabel } from 'primeng/iftalabel';
 })
 export class ElementsTableComponent {
   private authService = inject(AuthService);
+  public notesSvc = inject(NotesService);
+  public router = inject(Router);
   architect = this.authService.user();
   elements = signal<Element[]>([]);
+  expandedRowKeys: { [key: string]: boolean } = {};
+  private noteId$Map = new Map<number, Observable<number | null>>();
 
+  onRowExpand(event: { data: Element }) {
+    if (event?.data?.id != null) {
+      this.expandedRowKeys = { ...this.expandedRowKeys, [event.data.id]: true };
+    }
+  }
+
+  noteId$(elementId: number): Observable<number | null> {
+    if (!this.noteId$Map.has(elementId)) {
+      const obs = this.notesSvc
+        .noteIdForElement(elementId)
+        .pipe(shareReplay(1));
+      this.noteId$Map.set(elementId, obs);
+    }
+    return this.noteId$Map.get(elementId)!;
+  }
+
+  onRowCollapse(event: { data: Element }) {
+    if (event?.data?.id != null) {
+      const { [event.data.id]: _, ...rest } = this.expandedRowKeys;
+      this.expandedRowKeys = rest;
+      this.noteId$Map.delete(event.data.id);
+    }
+  }
   categories = signal<{ id: number; name: string }[]>([]);
   locations = signal<{ id: number; name: string; type: string }[]>([]);
 
@@ -79,7 +111,9 @@ export class ElementsTableComponent {
     this.api
       .request('GET', `architect/${this.architect?.id}/element`)
       .subscribe({
-        next: (res) => this.elements.set(res as Element[]),
+        next: (res) => {
+          this.elements.set(res as Element[]);
+        },
         error: () =>
           this.messageService.add({
             severity: 'error',
@@ -280,7 +314,6 @@ export class ElementsTableComponent {
     this.form.reset();
     this.selectedElementId = null;
   }
-
   filteredElements() {
     const cat = this.selectedCategoryId();
     if (!cat) return this.elements();
@@ -306,8 +339,20 @@ export class ElementsTableComponent {
     }
   }
 
-  getLocationName(id: number, type: string): string {
+  getLocationName(id?: number, type?: string): string {
+    if (!id || !type) return '-';
     const found = this.locations().find((l) => l.id === id && l.type === type);
     return found ? found.name : '-';
+  }
+
+  openExisting(elementId: number) {
+    this.notesSvc
+      .getByElement(elementId)
+      .pipe(take(1))
+      .subscribe((note) => {
+        if (note) {
+          this.notesSvc.openEditorById(note.id, this.router.url);
+        }
+      });
   }
 }

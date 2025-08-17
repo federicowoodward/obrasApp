@@ -1,22 +1,47 @@
+// ::ng-deep {
+//   .p-menu {
+//     --p-menu-item-padding: 0.8rem 1rem;
+//     .active {
+//       background: var(--p-menu-item-focus-background);
+//       .p-menu-item-content {
+//         border: 1px solid #eab308;
+//       }
+//     }
+//     li {
+//       width: auto;
+//     }
+//     .p-menu-item-content {
+//       border: 1px solid transparent;
+//     }
+//   }
+// }
+
 ::ng-deep {
   .p-menu {
-    height: 90 !important;
-    width: 220px !important;
-    --p-menu-item-padding: 0.8rem 1rem;
-    span {
-      font-size: 0.8rem;
+    background-color: transparent !important;
+    border: none !important;
+    min-width: auto !important;
+  }
+  .p-menu-item-link {
+    flex-direction: column !important;
+    padding: 1rem;
+    .p-menu-item-icon {
+      font-size: 1.4rem;
     }
-    .active {
-      background: var(--p-menu-item-focus-background);
-      .p-menu-item-content {
-        border: 1px solid #eab308;
-      }
+  }
+  &.active {
+    .p-menu-item-link {
+      color: var(--p-primary-700);
     }
-    li {
-      width: auto;
+    .p-menu-item-icon {
+      color: var(--p-primary-700);
     }
-    .p-menu-item-content {
-      border: 1px solid transparent;
+  }
+
+  .p-menu-item-link:hover {
+    color: var(--p-primary-500);
+    .p-menu-item-icon {
+      color: var(--p-primary-500) !important;
     }
   }
 }

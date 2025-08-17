@@ -16,7 +16,7 @@ export class Element {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column() 
+  @Column()
   name: string;
 
   @Column()
@@ -37,9 +37,9 @@ export class Element {
   @ManyToOne(() => Architect)
   architect: Architect;
 
-  @OneToOne(() => Note, { cascade: true })
-  @JoinColumn()
-  note: Note; // <- la clave foránea
+  @OneToOne(() => Note, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'note_id' })
+  note: Note | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

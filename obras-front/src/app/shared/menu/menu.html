@@ -1,14 +1,1 @@
-<div class="absolute md:hidden pt-1">
-  <p-drawer
-    [(visible)]="responsiveMenu"
-    position="left"
-    [styleClass]="'w-auto'"
-    (onHide)="onDrawerHide()"
-  >
-    <p-menu [model]="items"></p-menu>
-  </p-drawer>
-</div>
-
-<div class="hidden md:block w-17rem">
-  <p-menu [model]="items"></p-menu>
-</div>
+<p-menu [model]="items" class="h-full"></p-menu>

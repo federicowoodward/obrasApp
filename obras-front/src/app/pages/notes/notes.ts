@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { NoteData } from '../../services/notes-data.service';
+import { NoteData, NoteUpdateDto } from '../../services/notes-data.service';
 import { AuthService } from '../../services/auth.service';
 import { NoteEditDialog } from '../../shared/note-edit/note-edit-dialog';
 
@@ -35,7 +35,10 @@ export class Notes implements OnInit {
   editDialogVisible = false;
   noteToEdit: { id?: number; title: string; text: string } | null = null;
 
+  // TODO: inyectar/recibir elementId desde ruta o parent
   elementId = 1;
+
+  // Usuario actual
   architectId = this.authService.user()?.id || 1;
 
   ngOnInit() {
@@ -54,39 +57,42 @@ export class Notes implements OnInit {
 
   onSaveNote(note: { id?: number; title: string; text: string }) {
     if (note.id) {
-      this.notesData
-        .updateNote(note.id, { title: note.title, text: note.text })
-        .subscribe({
-          next: () => {
-            this.notes.update((arr) =>
-              arr.map((n) =>
-                n.id === note.id
-                  ? { ...n, title: note.title, text: note.text }
-                  : n
-              )
-            );
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Nota actualizada',
-            });
-            this.editDialogVisible = false;
-          },
-          error: () =>
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error al actualizar',
-            }),
-        });
+      // UPDATE
+      const dto: NoteUpdateDto = {
+        title: note.title,
+        text: note.text,
+        updatedBy: this.architectId,
+        updatedByType: 'architect',
+      };
+
+      this.notesData.updateNote(note.id, dto).subscribe({
+        next: () => {
+          // La lista ya se actualiza en el NoteData via tap()
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Nota actualizada',
+          });
+          this.editDialogVisible = false;
+        },
+        error: () =>
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al actualizar',
+          }),
+      });
     } else {
+      // CREATE
       this.notesData
         .createNote({
-          ...note,
-          elementId: this.elementId,
+          title: note.title,
+          text: note.text,
+          element: { id: this.elementId }, // ⟵ relación al elemento
           createdBy: this.architectId,
+          createdByType: 'architect',
         })
         .subscribe({
-          next: (newNote: any) => {
-            this.notes.update((arr) => [...arr, newNote]);
+          next: () => {
+            // La lista ya se actualiza en el NoteData via tap()
             this.messageService.add({
               severity: 'success',
               summary: 'Nota creada',
@@ -118,19 +124,24 @@ export class Notes implements OnInit {
   }
 
   deleteNote(note: any) {
-    this.notesData.deleteNote(note.id, this.architectId).subscribe({
-      next: () => {
-        this.notes.update((arr) => arr.filter((n) => n.id !== note.id));
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Nota eliminada',
-        });
-      },
-      error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error al eliminar',
-        }),
-    });
+    this.notesData
+      .deleteNote(note.id, {
+        deletedBy: this.architectId,
+        deletedByType: 'architect',
+      })
+      .subscribe({
+        next: () => {
+          // La lista ya se actualiza en el NoteData via tap()
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Nota eliminada',
+          });
+        },
+        error: () =>
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al eliminar',
+          }),
+      });
   }
 }

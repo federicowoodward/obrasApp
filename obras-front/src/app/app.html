@@ -3,26 +3,42 @@
 </div>
 
 <ng-template #mainLayout>
-  <!-- Header/Burger en mobile -->
-  <div class="absolute md:hidden left-0 right-0 py-3 pl-3 z-5 bg-blur">
-    <p-button (click)="toggleMenu()" icon="pi pi-bars" />
-  </div>
-  <!-- Flex container para sidebar + contenido -->
-  <div class="flex pt-8 md:pt-0 relative min-h-screen">
-    <!-- SIDEBAR: 
-      - oculto en mobile
-      - visible y ocupa 20% en md+ -->
-    <div class="hidden md:flex w-13rem flex-shrink-0">
-      <app-menu></app-menu>
-    </div>
+  <div class="h-screen flex flex-column">
+    <!-- Contenedor principal -->
+    <div class="flex flex-1 min-h-0">
+      <!-- Sidebar fijo desktop -->
+      <aside
+        class="flex justify-content-center align-content-center hidden lg:block shrink-0 lg:w-10rem"
+        *ngIf="authService.isAuthenticated?.()"
+      >
+        <div class="hidden lg:block">
+          <app-menu></app-menu>
+        </div>
+      </aside>
 
-    <!-- Drawer menu solo mobile (sigue igual, dentro de <app-menu>) -->
-    <!-- ... -->
-
-    <!-- MAIN CONTENT (80% en desktop, 100% en mobile) -->
-    <div class="flex-1 w-full">
-      <router-outlet></router-outlet>
-      <app-missing-menu></app-missing-menu>
+      <!-- Drawer mobile -->
+      <p-drawer
+        [(visible)]="sidebarVisible"
+        header="Menu"
+        position="left"
+        [modal]="true"
+        closable="false"
+      >
+        <app-menu></app-menu>
+      </p-drawer>
+      <!-- Main scrollable -->
+      <main class="flex-1 overflow-auto min-h-0 relative surface-50">
+        <div class="bg-custom p-3 flex justify-content-between">
+          <div class="lg:hidden">
+            <p-button (click)="openDrawer()" icon="pi pi-bars" />
+          </div>
+          <div class="hidden lg:block"></div>
+          <app-missing-menu></app-missing-menu>
+        </div>
+        <div class="p-3">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
     </div>
   </div>
 </ng-template>
