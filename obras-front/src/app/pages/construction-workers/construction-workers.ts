@@ -4,7 +4,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ApiService } from '../../core/http/api';
+import { ApiService } from '../../core/api';
 import { ConstructionWorker } from '../../models/interfaces.model';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmationService, MessageService } from 'primeng/api';

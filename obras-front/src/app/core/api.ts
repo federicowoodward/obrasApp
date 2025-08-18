@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { environment } from '../environment/environment';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -11,7 +12,7 @@ type MaybeWrapped<T> = T | { data: T; error?: any };
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private baseUrl = 'http://localhost:3000';
+  private baseUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -30,7 +31,8 @@ export class ApiService {
       params: HttpParams;
       body?: any;
     } = {
-      headers: headers ?? new HttpHeaders({ 'Content-Type': 'application/json' }),
+      headers:
+        headers ?? new HttpHeaders({ 'Content-Type': 'application/json' }),
       params: new HttpParams({ fromObject: params ?? {} }),
     };
 

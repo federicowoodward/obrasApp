@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { ApiService } from '../core/http/api';
+import { ApiService } from '../core/api';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 

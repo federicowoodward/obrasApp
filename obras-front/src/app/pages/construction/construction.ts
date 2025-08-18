@@ -1,6 +1,6 @@
 import { Component, inject, Inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../core/http/api';
+import { ApiService } from '../../core/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';

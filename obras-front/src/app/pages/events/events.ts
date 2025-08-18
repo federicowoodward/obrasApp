@@ -5,7 +5,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
-import { ApiService } from '../../core/http/api';
+import { ApiService } from '../../core/api';
 import { AuthService } from '../../services/auth.service';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';

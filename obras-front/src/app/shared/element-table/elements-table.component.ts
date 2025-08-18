@@ -15,7 +15,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { DialogModule } from 'primeng/dialog';
 import { Element } from '../../models/interfaces.model';
-import { ApiService } from '../../core/http/api';
+import { ApiService } from '../../core/api';
 import { AuthService } from '../../services/auth.service';
 import { IftaLabel } from 'primeng/iftalabel';
 import { NotesService } from '../../services/notes.service';

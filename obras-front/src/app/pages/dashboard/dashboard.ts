@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Card } from 'primeng/card';
-import { ApiService } from '../../core/http/api';
+import { ApiService } from '../../core/api';
 
 @Component({
   selector: 'app-dashboard',

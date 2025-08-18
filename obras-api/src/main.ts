@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: '*',
+    origin: [
+      'http://localhost:4200',
+      'https://obrasapp-production.up.railway.app',
+    ],
     methods: 'GET,POST,PUT,PATCH,DELETE',
     credentials: true,
   });

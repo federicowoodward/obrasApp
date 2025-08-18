@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, map, of, throwError, Observable } from 'rxjs';
-import { ApiService } from '../core/http/api';
+import { ApiService } from '../core/api';
 import { AuthService } from '../services/auth.service';
 
 export type UserType = 'architect' | 'worker';
