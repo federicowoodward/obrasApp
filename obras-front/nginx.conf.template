@@ -1,24 +1,24 @@
 server {
-  listen 80;
+  listen ${PORT};
   server_name _;
 
   root /usr/share/nginx/html;
   index index.html;
 
-  # Sirve archivos estáticos
+  # SPA
   location / {
     try_files $uri $uri/ /index.html;
   }
 
-  # Gzip básico
-  gzip on;
-  gzip_types text/plain text/css application/javascript application/json application/xml image/svg+xml;
-  gzip_min_length 1024;
-
-  # (Opcional) Cache de estáticos con hash en el nombre
+  # Estáticos (hash en nombre = cache largo)
   location ~* \.(?:js|css|png|jpg|jpeg|gif|svg|ico)$ {
     try_files $uri =404;
     expires 30d;
     access_log off;
   }
+
+  # Gzip
+  gzip on;
+  gzip_types text/plain text/css application/javascript application/json application/xml image/svg+xml;
+  gzip_min_length 1024;
 }
