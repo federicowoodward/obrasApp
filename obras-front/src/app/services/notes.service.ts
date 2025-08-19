@@ -1,8 +1,8 @@
-import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, map, of, throwError, Observable } from 'rxjs';
+import { Injectable, effect, signal, inject } from '@angular/core';
 import { ApiService } from '../core/api';
-import { AuthService } from '../services/auth.service';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ElementsService } from './elements.service';
 
 export type UserType = 'architect' | 'worker';
 
@@ -10,7 +10,7 @@ export interface Note {
   id: number;
   title: string;
   text: string;
-  createdAt?: string;
+  createdAt: string;
   element: { id: number };
   createdBy?: number;
   createdByType?: UserType;
@@ -33,87 +33,52 @@ export interface NoteUpdateDto {
   updatedByType: UserType;
 }
 
+export interface NoteDeleteDto {
+  deletedBy: number;
+  deletedByType: UserType;
+}
+
 @Injectable({ providedIn: 'root' })
 export class NotesService {
   private api = inject(ApiService);
-  private router = inject(Router);
-  private auth = inject(AuthService);
+  private elementsSvc = inject(ElementsService);
 
-  /** Normaliza la respuesta del backend a Note | null (soporta objeto, {data}, array o vacío). */
-  private unwrapNote(res: any): Note | null {
-    if (res == null) return null;
+  notes = signal<Note[]>([]);
 
-    // { data: ... } o { result: ... }
-    if (typeof res === 'object') {
-      if ('data' in res) {
-        const d = (res as any).data;
-        if (Array.isArray(d)) return d.length ? (d[0] as Note) : null;
-        return (d as Note) ?? null;
-      }
-      if ('result' in res) {
-        const r = (res as any).result;
-        if (Array.isArray(r)) return r.length ? (r[0] as Note) : null;
-        return (r as Note) ?? null;
-      }
-    }
-
-    // Array directo [] | [note]
-    if (Array.isArray(res)) return res.length ? (res[0] as Note) : null;
-
-    // Objeto directo
-    return (res as Note) ?? null;
+  constructor() {
+    // 🔄 Mantener notas sincronizadas con los elementos cargados
+    effect(() => {
+      const els = this.elementsSvc.elements();
+      const extracted = els
+        .map((el: any) => el?.note)
+        .filter((n: any): n is Note => !!n);
+      this.notes.set(extracted);
+    });
   }
 
-  /** Devuelve la nota del elemento o null si no existe. */
-  getByElement(elementId: number): Observable<Note | null> {
-    return this.api.request<any>('GET', `note/${elementId}`).pipe(
-      map((res) => this.unwrapNote(res)),
-      catchError((err) => {
-        if (err?.status === 404) return of(null);
-        return throwError(() => err);
-      })
+  /** Garantiza que haya elementos (y por lo tanto notas) inicializados */
+  ensureInitialized(architectId: number) {
+    return this.elementsSvc.ensureLoaded(architectId);
+  }
+
+  /** CRUD directo a /note, manteniendo la signal local */
+  create(dto: NoteCreateDto): Observable<Note> {
+    return this.api.request<Note>('POST', 'note', dto).pipe(
+      tap((created) => this.notes.update((curr) => [created, ...curr]))
     );
   }
 
-  /** True/False si existe nota para el elemento (para *ngIf). */
-  hasNoteForElement(elementId: number) {
-    return this.getByElement(elementId).pipe(map((n) => !!n));
+  update(id: number, dto: NoteUpdateDto): Observable<Note> {
+    return this.api.request<Note>('PUT', `note/${id}`, dto).pipe(
+      tap((updated) =>
+        this.notes.update((curr) => curr.map((n) => (n.id === updated.id ? updated : n)))
+      )
+    );
   }
 
-  /** Devuelve el noteId o null (permite decidir y navegar con un solo observable). */
-  noteIdForElement(elementId: number) {
-    return this.getByElement(elementId).pipe(map((n) => n?.id ?? null));
-  }
-
-  /** CRUD */
-  getById(id: number) {
-    return this.api.request<any>('GET', `note/${id}`).pipe(map((res) => this.unwrapNote(res)));
-  }
-
-  create(dto: NoteCreateDto) {
-    return this.api.request<Note>('POST', `note`, dto);
-  }
-
-  update(id: number, dto: NoteUpdateDto) {
-    return this.api.request<Note>('PUT', `note/${id}`, dto);
-  }
-
-  // Ojo: tu ApiService DELETE manda auditoría como params (4º arg)
-  delete(id: number, audit: { deletedBy: number; deletedByType: UserType }) {
-    return this.api.request<void>('DELETE', `note/${id}`, undefined, audit);
-  }
-
-  /** Navega a crear nota para un elemento. */
-  openNewForElement(elementId: number, returnUrl?: string) {
-    this.router.navigate(['/note-editor', 'new'], {
-      queryParams: { elementId, returnUrl },
-    });
-  }
-
-  /** Navega a editar una nota existente. */
-  openEditorById(noteId: number, returnUrl?: string) {
-    this.router.navigate(['/note-editor', noteId], {
-      queryParams: { returnUrl },
-    });
+  delete(id: number, dto: NoteDeleteDto): Observable<void> {
+    return this.api.request<void>('DELETE', `note/${id}`, dto).pipe(
+      tap(() => this.notes.update((curr) => curr.filter((n) => n.id !== id)))
+    );
   }
 }
