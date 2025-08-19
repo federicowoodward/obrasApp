@@ -18,25 +18,11 @@
           <button
             pButton
             icon="pi pi-pencil"
-            (click)="openEditDialog(note)"
+            (click)="goToEditor(note.id)"
             label="Editar"
-          ></button>
-          <button
-            pButton
-            icon="pi pi-trash"
-            (click)="confirmDelete($event, note)"
-            severity="danger"
-            label="Eliminar"
           ></button>
         </div>
       </div>
     </p-card>
   </div>
 </div>
-<p-confirmPopup></p-confirmPopup>
-<note-edit-dialog
-  [visible]="editDialogVisible"
-  [note]="noteToEdit"
-  (save)="onSaveNote($event)"
-  (cancel)="editDialogVisible = false"
-></note-edit-dialog>

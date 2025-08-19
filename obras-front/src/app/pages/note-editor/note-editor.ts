@@ -3,20 +3,19 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize, take } from 'rxjs';
-
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { IftaLabel } from 'primeng/iftalabel';
-
 import {
   NotesService,
   NoteCreateDto,
   NoteUpdateDto,
 } from '../../services/notes.service';
 import { AuthService } from '../../services/auth.service';
+import { EditorModule } from 'primeng/editor';
 
 @Component({
   selector: 'app-note-editor',
@@ -29,13 +28,14 @@ import { AuthService } from '../../services/auth.service';
     ConfirmPopupModule,
     InputTextModule,
     IftaLabel,
+    EditorModule,
   ],
   templateUrl: './note-editor.html',
   styleUrl: './note-editor.scss',
   providers: [MessageService, ConfirmationService],
 })
 export class NoteEditor implements OnInit {
-  private notes = inject(NotesService);
+  private notesSvc = inject(NotesService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -48,9 +48,12 @@ export class NoteEditor implements OnInit {
   elementId?: number;
   busy = false;
 
+  // 👇 Editor model
+  editorText = '';
+
   form = this.fb.group({
     title: ['', Validators.required],
-    text: ['', Validators.required],
+    text: ['', Validators.required], // seguimos usando este control para validación/envío
   });
 
   get headerTitle() {
@@ -59,37 +62,64 @@ export class NoteEditor implements OnInit {
 
   ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id')!;
+    const architectId = this.auth.user()?.id;
+
     if (idParam === 'new') {
-      // Modo crear: requiere elementId en query
       this.mode = 'create';
-      const el = Number(this.route.snapshot.queryParamMap.get('elementId') || 0);
-      this.elementId = el || undefined;
+      this.elementId =
+        Number(this.route.snapshot.queryParamMap.get('elementId') || 0) ||
+        undefined;
       if (!this.elementId) {
-        this.msg.add({ severity: 'warn', summary: 'Falta elementId en la URL' });
+        this.msg.add({
+          severity: 'warn',
+          summary: 'Falta elementId en la URL',
+        });
       }
-    } else {
-      // Modo editar: cargar nota por id
-      this.mode = 'edit';
-      this.noteId = Number(idParam);
-      if (!this.noteId) {
-        this.msg.add({ severity: 'error', summary: 'ID de nota inválido' });
-        this.navigateBack();
-        return;
-      }
-      this.notes.getById(this.noteId).pipe(take(1)).subscribe({
-        next: (note) => {
+      return;
+    }
+
+    this.mode = 'edit';
+    this.noteId = Number(idParam);
+    if (!this.noteId) {
+      this.msg.add({ severity: 'error', summary: 'ID de nota inválido' });
+      this.navigateBack();
+      return;
+    }
+    if (!architectId) {
+      this.msg.add({
+        severity: 'error',
+        summary: 'No se pudo identificar al usuario',
+      });
+      this.navigateBack();
+      return;
+    }
+
+    this.notesSvc
+      .ensureInitialized(architectId)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          const note = this.notesSvc.notes().find((n) => n.id === this.noteId);
           if (!note) {
             this.msg.add({ severity: 'warn', summary: 'Nota no encontrada' });
             this.navigateBack();
             return;
           }
           this.elementId = note.element?.id;
-          this.form.patchValue({ title: note.title, text: note.text });
+          this.editorText = note.text || ''; // 👈 precarga editor
+          this.form.patchValue({ title: note.title, text: note.text || '' }); // 👈 y el form
         },
         error: () =>
-          this.msg.add({ severity: 'error', summary: 'No se pudo cargar la nota' }),
+          this.msg.add({
+            severity: 'error',
+            summary: 'No se pudieron inicializar datos',
+          }),
       });
-    }
+  }
+
+  onEditorChange(val: string) {
+    this.editorText = val ?? '';
+    this.form.get('text')?.setValue(this.editorText);
   }
 
   save() {
@@ -97,14 +127,18 @@ export class NoteEditor implements OnInit {
     const userId = this.auth.user()?.id!;
     this.busy = true;
 
+    // asegura última sync antes de enviar
+    this.form.get('text')?.setValue(this.editorText);
+
     if (this.mode === 'edit' && this.noteId) {
       const dto: NoteUpdateDto = {
         title: this.form.value.title!,
-        text: this.form.value.text!,
+        text: this.form.value.text!, // HTML del editor
         updatedBy: userId,
         updatedByType: 'architect',
       };
-      this.notes.update(this.noteId, dto)
+      this.notesSvc
+        .update(this.noteId, dto)
         .pipe(finalize(() => (this.busy = false)))
         .subscribe({
           next: () => {
@@ -122,12 +156,13 @@ export class NoteEditor implements OnInit {
       }
       const dto: NoteCreateDto = {
         title: this.form.value.title!,
-        text: this.form.value.text!,
+        text: this.form.value.text!, // HTML del editor
         element: { id: this.elementId },
         createdBy: userId,
         createdByType: 'architect',
       };
-      this.notes.create(dto)
+      this.notesSvc
+        .create(dto)
         .pipe(finalize(() => (this.busy = false)))
         .subscribe({
           next: () => {
@@ -147,7 +182,11 @@ export class NoteEditor implements OnInit {
       message: '¿Seguro que deseas borrar esta nota?',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonProps: { label: 'Borrar', severity: 'danger' },
-      rejectButtonProps: { label: 'Cancelar', severity: 'secondary', outlined: true },
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+      },
       accept: () => this.delete(),
     });
   }
@@ -155,7 +194,7 @@ export class NoteEditor implements OnInit {
   private delete() {
     const userId = this.auth.user()?.id!;
     this.busy = true;
-    this.notes
+    this.notesSvc
       .delete(this.noteId!, { deletedBy: userId, deletedByType: 'architect' })
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({

@@ -111,25 +111,25 @@
             </div>
 
             <div class="flex gap-2 align-items-start md:align-items-center">
-              <ng-container
-                *ngIf="noteId$(el.id) | async as noteId; else createNoteBtn"
-              >
+              <!-- Si el elemento tiene nota embebida, mostramos Editar -->
+              <ng-container *ngIf="el.note?.id; else createNoteBtn">
                 <button
                   pButton
-                  icon="pi pi-eye"
-                  label="Ver nota"
+                  icon="pi pi-pencil"
+                  label="Editar nota"
                   outlined
-                  (click)="notesSvc.openEditorById(el.id!, router.url)"
+                  (click)="editNote(el.note.id)"
                 ></button>
               </ng-container>
 
+              <!-- Si no tiene nota, mostramos Crear -->
               <ng-template #createNoteBtn>
                 <button
                   pButton
                   icon="pi pi-plus"
                   label="Crear nota"
                   outlined
-                  (click)="notesSvc.openNewForElement(el.id, router.url)"
+                  (click)="createNoteForElement(el.id)"
                 ></button>
               </ng-template>
 
@@ -139,6 +139,7 @@
                 label="Editar elemento"
                 (click)="openEditDialog(el)"
               ></button>
+
               <button
                 pButton
                 icon="pi pi-trash"
@@ -168,6 +169,7 @@
   [style]="{ width: '640px', maxWidth: '95vw' }"
   header="{{ isNew() ? 'Agregar Elemento' : 'Editar Elemento' }}"
   styleClass="p-3"
+  [resizable]="false"
 >
   <form [formGroup]="form" (ngSubmit)="saveElement()" class="flex flex-column">
     <div class="p-fluid flex flex-column gap-2">
