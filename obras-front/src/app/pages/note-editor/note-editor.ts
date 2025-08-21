@@ -117,7 +117,7 @@ export class NoteEditor implements OnInit {
       });
   }
 
-  onEditorChange(val: string) {
+  onEditorChange(val: any) {
     this.editorText = val ?? '';
     this.form.get('text')?.setValue(this.editorText);
   }

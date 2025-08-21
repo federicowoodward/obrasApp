@@ -9,15 +9,7 @@
       <input id="title" pInputText formControlName="title" autocomplete="off" />
     </p-iftalabel>
 
-    <p-iftalabel>
-      <label for="text">Contenido</label>
-      <p-editor
-        (ngModel)="editorText"
-        (ngModelChange)="onEditorChange($event)"
-        [ngModelOptions]="{ standalone: true }"
-        [style]="{ height: '320px' }"
-      ></p-editor>
-    </p-iftalabel>
+    <p-editor formControlName="text" [style]="{ height: '320px' }"></p-editor>
 
     <div class="flex gap-2 align-items-center">
       <button
