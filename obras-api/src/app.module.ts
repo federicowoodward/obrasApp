@@ -38,11 +38,11 @@ import { DevSeederModule } from './shared/init/dev-seeder.module';
     ElementLocationModule,
     ElementMoveModule,
     CategoryModule,
-    SeederModule,
+    // SeederModule,
     DevSeederModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     ConfigModule.forRoot({
-      envFilePath: `.env`, // 🔥 lee .env.dev si NODE_ENV=development
+      envFilePath: `.env`, 
       isGlobal: true,
     }),
     ElementMoveModule,

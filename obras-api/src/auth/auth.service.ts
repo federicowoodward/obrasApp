@@ -26,7 +26,7 @@ export class AuthService {
       )
       .getOne();
 
-    if (architect && (await bcrypt.compare(password, architect.password))) {
+      if (architect && (await bcrypt.compare(password, architect.password))) {
       return {
         role: 'architect',
         user: {

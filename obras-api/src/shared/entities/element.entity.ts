@@ -37,7 +37,10 @@ export class Element {
   @ManyToOne(() => Architect)
   architect: Architect;
 
-  @OneToOne(() => Note, { nullable: true, onDelete: 'SET NULL' })
+  @OneToOne(() => Note, (note) => note.element, {
+    nullable: true,
+    onDelete: 'SET NULL', 
+  })
   @JoinColumn({ name: 'note_id' })
   note: Note | null;
 

@@ -65,7 +65,7 @@ export class ElementService {
   async findAll(architectId: number) {
     return this.elementRepo.find({
       where: { architect: { id: architectId } },
-      relations: ['category', 'location'],
+      relations: ['category', 'location', 'note'],
     });
   }
 
