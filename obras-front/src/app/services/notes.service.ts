@@ -58,27 +58,33 @@ export class NotesService {
 
   /** Garantiza que haya elementos (y por lo tanto notas) inicializados */
   ensureInitialized(architectId: number) {
-    return this.elementsSvc.ensureLoaded(architectId);
+    return this.elementsSvc.init(architectId);
   }
 
   /** CRUD directo a /note, manteniendo la signal local */
   create(dto: NoteCreateDto): Observable<Note> {
-    return this.api.request<Note>('POST', 'note', dto).pipe(
-      tap((created) => this.notes.update((curr) => [created, ...curr]))
-    );
+    return this.api
+      .request<Note>('POST', 'note', dto)
+      .pipe(tap((created) => this.notes.update((curr) => [created, ...curr])));
   }
 
   update(id: number, dto: NoteUpdateDto): Observable<Note> {
-    return this.api.request<Note>('PUT', `note/${id}`, dto).pipe(
-      tap((updated) =>
-        this.notes.update((curr) => curr.map((n) => (n.id === updated.id ? updated : n)))
-      )
-    );
+    return this.api
+      .request<Note>('PUT', `note/${id}`, dto)
+      .pipe(
+        tap((updated) =>
+          this.notes.update((curr) =>
+            curr.map((n) => (n.id === updated.id ? updated : n))
+          )
+        )
+      );
   }
 
   delete(id: number, dto: NoteDeleteDto): Observable<void> {
-    return this.api.request<void>('DELETE', `note/${id}`, dto).pipe(
-      tap(() => this.notes.update((curr) => curr.filter((n) => n.id !== id)))
-    );
+    return this.api
+      .request<void>('DELETE', `note/${id}`, dto)
+      .pipe(
+        tap(() => this.notes.update((curr) => curr.filter((n) => n.id !== id)))
+      );
   }
 }

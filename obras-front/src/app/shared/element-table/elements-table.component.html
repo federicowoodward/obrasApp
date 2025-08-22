@@ -2,6 +2,7 @@
 
 <div class="flex flex-column sm:flex-row justify-content-between mb-3 gap-4">
   <div class="flex flex-row gap-2">
+    <!-- Categorías -->
     <div class="flex items-center gap-2">
       <p-iftalabel>
         <label for="categories">Categorías: </label>
@@ -14,6 +15,24 @@
           <option [value]="0">Todas</option>
           <option *ngFor="let cat of categories()" [value]="cat.id">
             {{ cat.name }}
+          </option>
+        </select>
+      </p-iftalabel>
+    </div>
+
+    <!-- Ubicaciones -->
+    <div class="flex items-center gap-2">
+      <p-iftalabel>
+        <label for="locations">Ubicaciones: </label>
+        <select
+          class="p-inputtext"
+          id="locations"
+          (change)="onLocationChange($event)"
+          [value]="selectedLocationKey()"
+        >
+          <option value="all">Todas</option>
+          <option *ngFor="let loc of locations()" [value]="loc.key">
+            {{ loc.name }}
           </option>
         </select>
       </p-iftalabel>
@@ -38,7 +57,7 @@
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"
     [paginator]="true"
-    [globalFilterFields]="['name', 'category.name']"
+    [globalFilterFields]="['name', 'category.name', 'location.name']"
     responsiveLayout="scroll"
   >
     <!-- Caption: buscador global -->

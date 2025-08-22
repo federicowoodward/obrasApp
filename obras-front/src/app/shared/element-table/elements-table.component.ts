@@ -40,6 +40,11 @@ import { ElementsService } from '../../services/elements.service';
   providers: [ConfirmationService, MessageService],
 })
 export class ElementsTableComponent {
+  /**
+   * Tabla de elementos con CRUD, filtros por categoría/ubicación y
+   * edición de notas asociadas. Consume `ElementsService` para datos
+   * y usa PrimeNG para la UI.
+   */
   private authService = inject(AuthService);
   private elementsSvc = inject(ElementsService);
   private fb = inject(FormBuilder);
@@ -47,19 +52,29 @@ export class ElementsTableComponent {
   private messageService = inject(MessageService);
   public router = inject(Router);
 
+  /** Usuario autenticado (arquitecto) para scoping de datos. */
   architect = this.authService.user();
 
+  /** Lista reactiva de elementos proveniente del servicio. */
   elements = this.elementsSvc.elements;
 
-  categories = signal<{ id: number; name: string }[]>([]);
-  locations = signal<{ id: number; name: string; type: string }[]>([]);
+  /** Opciones derivadas de categorías/ubicaciones para filtros. */
+  categories = this.elementsSvc.categories;
+  locations = this.elementsSvc.locations;
 
+  /** Estado del filtro seleccionado (0: todas / 'all': todas). */
+  selectedCategoryId = signal<number>(0);
+  selectedLocationKey = signal<string>('all');
+
+  /** Estado de filas expandidas en la tabla (PrimeNG). */
   expandedRowKeys: { [key: string]: boolean } = {};
+
+  /** Estado del diálogo de alta/edición y del elemento seleccionado. */
   displayDialog = signal(false);
   isNew = signal(false);
   selectedElementId: number | null = null;
-  selectedCategoryId = signal<number | null>(null);
 
+  /** Formulario reactivo para crear/editar elementos. */
   form: FormGroup = this.fb.group({
     name: ['', Validators.required],
     brand: ['', Validators.required],
@@ -70,19 +85,13 @@ export class ElementsTableComponent {
     locationType: ['', Validators.required],
   });
 
+  /**
+   * Hook de inicialización del componente.
+   * Carga inicial de elementos para el arquitecto autenticado.
+   */
   ngOnInit() {
     if (!this.architect?.id) return;
-    this.elementsSvc.ensureLoaded(this.architect.id).subscribe({
-      next: (res) => {
-        // derivar categorías desde los elementos cargados
-        const uniqueCats = new Map<number, { id: number; name: string }>();
-        res.forEach((el: any) => {
-          const c = el?.category;
-          if (c?.id && !uniqueCats.has(c.id))
-            uniqueCats.set(c.id, { id: c.id, name: c.name });
-        });
-        this.categories.set(Array.from(uniqueCats.values()));
-      },
+    this.elementsSvc.init(this.architect.id).subscribe({
       error: () =>
         this.messageService.add({
           severity: 'error',
@@ -94,12 +103,21 @@ export class ElementsTableComponent {
   }
 
   // --- Fila expandida (sin noteId$Map) ---
+
+  /**
+   * Marca una fila como expandida en la tabla.
+   * @param event Evento de PrimeNG con el elemento expandido.
+   */
   onRowExpand(event: { data: Element }) {
     if (event?.data?.id != null) {
       this.expandedRowKeys = { ...this.expandedRowKeys, [event.data.id]: true };
     }
   }
 
+  /**
+   * Colapsa una fila previamente expandida en la tabla.
+   * @param event Evento de PrimeNG con el elemento colapsado.
+   */
   onRowCollapse(event: { data: Element }) {
     if (event?.data?.id != null) {
       const { [event.data.id]: _, ...rest } = this.expandedRowKeys;
@@ -107,7 +125,12 @@ export class ElementsTableComponent {
     }
   }
 
-  // --- Dialogs ---
+  // --- Diálogos ---
+
+  /**
+   * Abre el diálogo para crear un nuevo elemento.
+   * Inicializa el formulario y preselecciona la primera ubicación disponible (si existe).
+   */
   openAddDialog() {
     this.form.reset();
     if (this.locations().length > 0) {
@@ -120,6 +143,10 @@ export class ElementsTableComponent {
     this.selectedElementId = null;
   }
 
+  /**
+   * Abre el diálogo para editar un elemento existente.
+   * @param element Elemento a editar; sus campos se precargan en el formulario.
+   */
   openEditDialog(element: Element) {
     this.form.patchValue({
       name: element.name,
@@ -135,6 +162,10 @@ export class ElementsTableComponent {
     this.selectedElementId = element.id;
   }
 
+  /**
+   * Cancela y cierra el diálogo de alta/edición.
+   * Limpia el formulario y deselecciona el elemento.
+   */
   cancelDialog() {
     this.displayDialog.set(false);
     this.form.reset();
@@ -142,6 +173,13 @@ export class ElementsTableComponent {
   }
 
   // --- Guardar / Eliminar (CRUD) ---
+
+  /**
+   * Guarda el elemento en edición.
+   * - Si `isNew` es true, crea un nuevo elemento.
+   * - Si `isNew` es false, actualiza el elemento seleccionado.
+   * Valida el formulario y normaliza `buyDate` a `YYYY-MM-DD` cuando llega como `Date`.
+   */
   saveElement() {
     if (this.form.invalid || !this.architect?.id) return;
 
@@ -183,9 +221,15 @@ export class ElementsTableComponent {
     }
   }
 
+  /**
+   * Abre un diálogo de confirmación y, si se acepta, elimina el elemento.
+   * @param event Evento del click que disparó la confirmación (se usa como `target` del popup).
+   * @param elementId ID del elemento a eliminar.
+   */
   confirmDeleteElement(event: Event, elementId: number) {
     if (!this.architect?.id) return;
     this.confirmationService.confirm({
+      // Nota: PrimeNG espera un HTMLElement; asegurate de castear correctamente si es necesario.
       target: event.currentTarget as EventTarget,
       message: '¿Seguro que deseas borrar este elemento?',
       icon: 'pi pi-exclamation-triangle',
@@ -216,38 +260,88 @@ export class ElementsTableComponent {
     });
   }
 
-  // --- Helpers UI (se mantienen) ---
+  /**
+   * Devuelve la lista filtrada por la categoría y/o ubicacion seleccionada.
+   * Si `selectedCategoryId` es 0 (o falsy), devuelve todos los elementos.
+   * @returns Elementos filtrados por categoría y ubicaciones (o todos si no hay filtro).
+   */
   filteredElements() {
+    let list = this.elements();
+
+    // Filtro por categoría
     const cat = this.selectedCategoryId();
-    if (!cat) return this.elements();
-    return this.elements().filter((el) => (el as any).category?.id === cat);
+    if (cat && cat !== 0) {
+      list = list.filter((el: any) => el.category?.id === cat);
+    }
+
+    // Filtro por ubicación
+    const locKey = this.selectedLocationKey();
+    if (locKey && locKey !== 'all') {
+      const [type, idStr] = locKey.split(':');
+      const id = Number(idStr);
+      list = list.filter(
+        (el: any) =>
+          el.location?.locationType === type && el.location?.locationId === id
+      );
+    }
+
+    return list;
   }
 
-  onCategoryChange(event: any) {
-    const value = +event.target.value;
-    this.selectedCategoryId.set(value === 0 ? null : value);
-  }
-
+  /**
+   * Aplica filtro global de PrimeNG sobre la tabla.
+   * @param event Evento `input` del campo de búsqueda.
+   * @param dt Referencia a la instancia de `p-table` (template variable).
+   */
   onGlobalFilter(event: Event, dt: any) {
     const value = (event.target as HTMLInputElement).value;
     dt.filterGlobal(value, 'contains');
   }
 
-  onLocationChange(event: any) {
-    const selectedId = +event.target.value;
-    const loc = this.locations().find((l) => l.id === selectedId);
-    if (loc) {
-      this.form.get('locationType')?.setValue(loc.type);
-      this.form.get('locationId')?.setValue(loc.id);
-    }
+  /**
+   * Cambia el filtro de categoría seleccionada.
+   * @param ev Evento `change` del `<select>` de categorías.
+   */
+  onCategoryChange(ev: Event) {
+    const value = Number((ev.target as HTMLSelectElement).value);
+    this.selectedCategoryId.set(value);
   }
 
+  /**
+   * Cambia el filtro de ubicación seleccionada.
+   * @param ev Evento `change` del `<select>` de ubicaciones.
+   * El valor esperado es `'all'` o la clave `'tipo:id'` (p.ej. `deposit:1`).
+   */
+  onLocationChange(ev: Event) {
+    const value = (ev.target as HTMLSelectElement).value;
+    this.selectedLocationKey.set(value);
+  }
+
+  onFormLocationSelect(ev: Event) {
+    const id = Number((ev.target as HTMLSelectElement).value);
+    const opt = this.locations().find((l) => l.id === id);
+    this.form.patchValue({
+      locationId: id,
+      locationType: opt?.type ?? '',
+    });
+  }
+
+  /**
+   * Obtiene el nombre descriptivo de una ubicación por `id` y `type`.
+   * @param id ID de la ubicación (locationId).
+   * @param type Tipo de ubicación (`deposit` | `construction`).
+   * @returns Nombre legible o `'-'` si no se encuentra.
+   */
   getLocationName(id?: number, type?: string): string {
     if (!id || !type) return '-';
     const found = this.locations().find((l) => l.id === id && l.type === type);
     return found ? found.name : '-';
   }
 
+  /**
+   * Navega al editor de notas para editar una nota existente.
+   * @param noteId ID de la nota a editar.
+   */
   editNote(noteId: number) {
     console.log('note-editor', noteId);
     this.router.navigate(['note-editor', noteId], {
@@ -255,9 +349,11 @@ export class ElementsTableComponent {
     });
   }
 
+  /**
+   * Navega al editor de notas en modo creación, asociado a un elemento.
+   * @param elementId ID del elemento para crear la nota.
+   */
   createNoteForElement(elementId: number) {
-    // Usamos el mismo route param :id pero marcamos que es "alta" con query param.
-    // Así el NoteEditor sabe que ese id corresponde a un ELEMENTO y no a una nota aún.
     this.router.navigate(['note-editor', elementId], {
       queryParams: { from: this.router.url, mode: 'create', elementId },
     });

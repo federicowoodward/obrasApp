@@ -7,6 +7,8 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { NotesService } from '../../services/notes.service';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { AuthService } from '../../services/auth.service';
+import { ElementsService } from '../../services/elements.service';
 
 @Component({
   selector: 'app-notes',
@@ -22,14 +24,27 @@ import { MessageService, ConfirmationService } from 'primeng/api';
   styleUrl: './notes.scss',
   providers: [MessageService, ConfirmationService],
 })
-export class Notes implements OnInit{
+export class Notes implements OnInit {
   private notesSvc = inject(NotesService);
+  private elementsSvc = inject(ElementsService);
+  private messageService = inject(MessageService);
   public router = inject(Router);
-  
+  private authService = inject(AuthService);
+  architect = this.authService.user();
+
   notes = this.notesSvc.notes; // señal compartida
-  
+
   ngOnInit() {
-    console.log(this.notes())
+    if (!this.architect?.id) return;
+    this.elementsSvc.init(this.architect.id).subscribe({
+      error: () =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los elementos',
+          life: 2500,
+        }),
+    });
   }
 
   goToEditor(id: number) {
