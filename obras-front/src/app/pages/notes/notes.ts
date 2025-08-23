@@ -9,6 +9,10 @@ import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { ElementsService } from '../../services/elements.service';
+import { EditorModule } from 'primeng/editor';
+import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import DOMPurify from 'dompurify';
 
 @Component({
   selector: 'app-notes',
@@ -19,6 +23,8 @@ import { ElementsService } from '../../services/elements.service';
     ButtonModule,
     ToastModule,
     ConfirmPopupModule,
+    EditorModule,
+    FormsModule,
   ],
   templateUrl: './notes.html',
   styleUrl: './notes.scss',
@@ -30,6 +36,7 @@ export class Notes implements OnInit {
   private messageService = inject(MessageService);
   public router = inject(Router);
   private authService = inject(AuthService);
+  private sanitizer = inject(DomSanitizer);
   architect = this.authService.user();
 
   notes = this.notesSvc.notes; // señal compartida
@@ -50,4 +57,11 @@ export class Notes implements OnInit {
   goToEditor(id: number) {
     this.router.navigate(['note-editor', id]);
   }
+
+
+renderNoteHtml(text?: string): SafeHtml {
+  const html = text || '';
+  const clean = DOMPurify.sanitize(html);
+  return this.sanitizer.bypassSecurityTrustHtml(clean);
+}
 }

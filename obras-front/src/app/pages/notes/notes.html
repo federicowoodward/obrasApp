@@ -1,5 +1,5 @@
 <p-toast></p-toast>
-<div class="p-4">
+<div class="p-">
   <div class="flex justify-content-between align-items-center mb-3">
     <h2 class="pb-2">Notas de elementos</h2>
   </div>
@@ -13,7 +13,10 @@
           >
         </div>
         <h3 class="mb-1">{{ note.title }}</h3>
-        <div class="note-content">{{ note.text }}</div>
+        <div class="ql-snow">
+          <div class="ql-editor" [innerHTML]="renderNoteHtml(note.text)"></div>
+        </div>
+
         <div class="flex gap-2 mt-2">
           <button
             pButton

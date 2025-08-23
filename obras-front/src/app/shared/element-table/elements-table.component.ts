@@ -354,8 +354,8 @@ export class ElementsTableComponent {
    * @param elementId ID del elemento para crear la nota.
    */
   createNoteForElement(elementId: number) {
-    this.router.navigate(['note-editor', elementId], {
-      queryParams: { from: this.router.url, mode: 'create', elementId },
+    this.router.navigate(['note-editor', 'new'], {
+      queryParams: { from: this.router.url, elementId },
     });
   }
 }

@@ -16,6 +16,8 @@ import {
 } from '../../services/notes.service';
 import { AuthService } from '../../services/auth.service';
 import { EditorModule } from 'primeng/editor';
+import { TableModule } from 'primeng/table';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-note-editor',
@@ -29,6 +31,7 @@ import { EditorModule } from 'primeng/editor';
     InputTextModule,
     IftaLabel,
     EditorModule,
+    TableModule,
   ],
   templateUrl: './note-editor.html',
   styleUrl: './note-editor.scss',
@@ -42,6 +45,7 @@ export class NoteEditor implements OnInit {
   private msg = inject(MessageService);
   private confirm = inject(ConfirmationService);
   private auth = inject(AuthService);
+  private location = inject(Location);
 
   mode: 'create' | 'edit' = 'create';
   noteId?: number;
@@ -61,7 +65,7 @@ export class NoteEditor implements OnInit {
   }
 
   ngOnInit() {
-    const idParam = this.route.snapshot.paramMap.get('id')!;
+    const idParam = this.route.snapshot.paramMap.get('id'); // "new" | noteId
     const architectId = this.auth.user()?.id;
 
     if (idParam === 'new') {
@@ -75,6 +79,7 @@ export class NoteEditor implements OnInit {
           summary: 'Falta elementId en la URL',
         });
       }
+      this.form.reset({ title: '', text: '' });
       return;
     }
 
@@ -106,8 +111,8 @@ export class NoteEditor implements OnInit {
             return;
           }
           this.elementId = note.element?.id;
-          this.editorText = note.text || ''; // 👈 precarga editor
-          this.form.patchValue({ title: note.title, text: note.text || '' }); // 👈 y el form
+          this.editorText = note.text || '';
+          this.form.patchValue({ title: note.title, text: note.text || '' });
         },
         error: () =>
           this.msg.add({
@@ -121,19 +126,21 @@ export class NoteEditor implements OnInit {
     this.editorText = val ?? '';
     this.form.get('text')?.setValue(this.editorText);
   }
-
   save() {
     if (this.form.invalid || this.busy) return;
     const userId = this.auth.user()?.id!;
     this.busy = true;
 
-    // asegura última sync antes de enviar
-    this.form.get('text')?.setValue(this.editorText);
+    const dtoBase = {
+      title: this.form.value.title!,
+      text: this.form.value.text!,
+    };
+
+    const goBack = () => this.location.back();
 
     if (this.mode === 'edit' && this.noteId) {
       const dto: NoteUpdateDto = {
-        title: this.form.value.title!,
-        text: this.form.value.text!, // HTML del editor
+        ...dtoBase,
         updatedBy: userId,
         updatedByType: 'architect',
       };
@@ -143,7 +150,7 @@ export class NoteEditor implements OnInit {
         .subscribe({
           next: () => {
             this.msg.add({ severity: 'success', summary: 'Nota guardada' });
-            this.navigateBack();
+            goBack();
           },
           error: () =>
             this.msg.add({ severity: 'error', summary: 'Error al guardar' }),
@@ -155,8 +162,7 @@ export class NoteEditor implements OnInit {
         return;
       }
       const dto: NoteCreateDto = {
-        title: this.form.value.title!,
-        text: this.form.value.text!, // HTML del editor
+        ...dtoBase,
         element: { id: this.elementId },
         createdBy: userId,
         createdByType: 'architect',
@@ -167,7 +173,7 @@ export class NoteEditor implements OnInit {
         .subscribe({
           next: () => {
             this.msg.add({ severity: 'success', summary: 'Nota creada' });
-            this.navigateBack();
+            goBack();
           },
           error: () =>
             this.msg.add({ severity: 'error', summary: 'Error al crear' }),

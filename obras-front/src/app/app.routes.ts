@@ -34,5 +34,6 @@ export const routes: Routes = [
   { path: 'event/:id', component: EventDetail, canActivate: [AuthGuard] },
   { path: 'notes', component: Notes, canActivate: [AuthGuard] },
   { path: 'note-editor/:id', component: NoteEditor, canActivate: [AuthGuard] },
+  { path: 'note-editor/new', component: NoteEditor, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
