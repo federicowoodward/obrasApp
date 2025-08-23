@@ -18,7 +18,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build /app/dist/obrasApp/browser ./
 
 # Plantilla para que Nginx escuche en $PORT que define Railway
-COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY ./nginx.conf /etc/nginx/templates/default.conf.template
 
 # MUY IMPORTANTE: solo sustituir la variable PORT (que existe en el entorno de Railway)
 ENV NGINX_ENVSUBST_FILTER=PORT
