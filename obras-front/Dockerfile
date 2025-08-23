@@ -5,21 +5,21 @@ COPY package*.json ./
 RUN npm i --f
 COPY . .
 RUN npm run build -- --configuration=production
-
+CMD ["npm", "run", "start"]
 # Runtime Nginx
-FROM nginx:1.25-alpine
-WORKDIR /usr/share/nginx/html
+# FROM nginx:1.25-alpine
+# WORKDIR /usr/share/nginx/html
 
 # Copia el build
-COPY --from=build /app/dist/obrasApp/browser ./
+# COPY --from=build /app/dist/obrasApp/browser ./
 
 # Copia la plantilla (no conf directo)
-COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
+# COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # Default local; en Railway inyectan PORT automáticamente
-ENV PORT=80
+# ENV PORT=80
 
 # Opcional
-EXPOSE 80
+# EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# CMD ["nginx", "-g", "daemon off;"]
