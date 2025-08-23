@@ -42,6 +42,9 @@ export class AuthService {
     });
 
     if (worker && (await bcrypt.compare(password, worker.password))) {
+
+      //agregar logger aca
+      
       return {
         role: 'worker',
         user: {

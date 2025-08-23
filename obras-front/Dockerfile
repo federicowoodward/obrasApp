@@ -2,24 +2,24 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm i --f
+RUN npm ci
 COPY . .
 RUN npm run build -- --configuration=production
-CMD ["npm", "run", "start"]
+
+# 🔎 DEBUG: mostrar dónde quedó el build
+RUN echo ">>> DIST TREE" && ls -lah dist && \
+    ls -lah dist/obrasApp || true && \
+    ls -lah dist/obrasApp/browser || true
+
 # Runtime Nginx
-# FROM nginx:1.25-alpine
-# WORKDIR /usr/share/nginx/html
+FROM nginx:1.25-alpine
+WORKDIR /usr/share/nginx/html
 
-# Copia el build
-# COPY --from=build /app/dist/obrasApp/browser ./
+# Copia el build (OJO: nombre debe coincidir con tu proyecto)
+COPY --from=build /app/dist/obrasApp/browser ./
 
-# Copia la plantilla (no conf directo)
-# COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
+# Nginx conf simple para SPA
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Default local; en Railway inyectan PORT automáticamente
-# ENV PORT=80
-
-# Opcional
-# EXPOSE 80
-
-# CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
