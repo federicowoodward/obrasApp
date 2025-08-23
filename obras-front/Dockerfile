@@ -1,25 +1,28 @@
-# Build Angular
+# ---------- Build Angular ----------
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm i --f
 COPY . .
+# Asegura build prod
 RUN npm run build -- --configuration=production
 
-# 🔎 DEBUG: mostrar dónde quedó el build
-RUN echo ">>> DIST TREE" && ls -lah dist && \
-    ls -lah dist/obrasApp || true && \
-    ls -lah dist/obrasApp/browser || true
+# (OPCIONAL) debug del path de salida
+RUN echo ">>> dist tree" && ls -lah dist && ls -lah dist/obrasApp && ls -lah dist/obrasApp/browser
 
-# Runtime Nginx
+# ---------- Runtime Nginx ----------
 FROM nginx:1.25-alpine
 WORKDIR /usr/share/nginx/html
 
-# Copia el build (OJO: nombre debe coincidir con tu proyecto)
+# Copia el build (OJO: 'obrasApp' debe coincidir con tu angular.json)
 COPY --from=build /app/dist/obrasApp/browser ./
 
-# Nginx conf simple para SPA
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Plantilla para que Nginx escuche en $PORT que define Railway
+COPY ./nginx.conf.template /etc/nginx/templates/default.conf.template
 
+# MUY IMPORTANTE: solo sustituir la variable PORT (que existe en el entorno de Railway)
+ENV NGINX_ENVSUBST_FILTER=PORT
+
+# Opcional: salud y logs más limpios
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
