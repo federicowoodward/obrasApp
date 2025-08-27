@@ -25,28 +25,25 @@ export class ApiService {
   ): Observable<T> {
     const fullUrl = `${this.baseUrl}/${url}`;
 
-    // Armamos las opciones y si hay "data" lo mandamos en "body" SIEMPRE
-    const options: {
-      headers: HttpHeaders;
-      params: HttpParams;
-      body?: any;
-    } = {
+    const sanitizedParamsObj: Record<string, string> = {};
+    Object.entries(params ?? {}).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) sanitizedParamsObj[k] = String(v);
+    });
+
+    const options = {
       headers:
         headers ?? new HttpHeaders({ 'Content-Type': 'application/json' }),
-      params: new HttpParams({ fromObject: params ?? {} }),
-    };
-
-    if (data !== undefined) {
-      options.body = data; // <- esto habilita body en DELETE/GET si lo necesitás
-    }
+      params: new HttpParams({ fromObject: sanitizedParamsObj }),
+      body: data !== undefined ? data : undefined,
+    } as const;
 
     const req$ = this.http.request<MaybeWrapped<T>>(method, fullUrl, options);
-
     return req$.pipe(
       tap((resp) => {
         console.groupCollapsed(`[API] ${method} ${fullUrl}`);
         if (data !== undefined) console.log('Body:', data);
-        if (params) console.log('Params:', params);
+        if (Object.keys(sanitizedParamsObj).length)
+          console.log('Params:', sanitizedParamsObj);
         console.log('Response:', resp);
         console.groupEnd();
       }),

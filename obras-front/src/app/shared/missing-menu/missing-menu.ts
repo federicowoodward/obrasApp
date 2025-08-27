@@ -1,63 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
-import { Message } from 'primeng/message';
-import { Note } from '../../models/interfaces.model';
-import { CommonModule } from '@angular/common';
-import { signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { MessageModule } from 'primeng/message';
+import { TagModule } from 'primeng/tag';
+import { MissingsService } from '../../services/missings.service';
 
 @Component({
   selector: 'app-missing-menu',
   standalone: true,
-  imports: [DrawerModule, ButtonModule, Message, CommonModule],
+  imports: [CommonModule, ButtonModule, DrawerModule, MessageModule, TagModule],
   templateUrl: './missing-menu.html',
   styleUrl: './missing-menu.scss',
 })
 export class MissingMenu implements OnInit {
-  visible = false;
-  notes = signal<Note[]>([]);
-  animButton = true;
+  private router = inject(Router);
+  svc = inject(MissingsService);
 
-  constructor(private router: Router) {}
+  @Input() architectId!: number; // pásalo desde el layout o auth
+  @Input() constructionId?: number; // opcional para filtrar por obra
+
+  visible = false;
 
   ngOnInit(): void {
-    this.loadNotes();
-  }
-
-  loadNotes() {
-    const cached = localStorage.getItem('mock_notes');
-    if (cached) {
-      this.notes.set(JSON.parse(cached) as Note[]);
-    } else {
+    if (this.architectId) {
+      this.svc
+        .initForArchitect(this.architectId, this.constructionId)
+        .subscribe();
     }
   }
 
   openDrawer() {
-    this.animButton = false;
-    this.loadNotes();
     this.visible = true;
   }
 
-  goTo(note: Note) {
-    let route = '';
-    let fragment = '';
+  refresh() {
+    this.svc.refresh().subscribe();
+  }
 
-    switch (note.title) {
-      //esto probablemente esta mal
-      case 'worker':
-        route = '/workers';
-        break;
-      case 'material':
-        route = '/deposit';
-        break;
-      case 'element':
-        route = '/deposit';
-        break;
-    }
-
-    this.router.navigate([route], {
-      fragment: fragment || undefined,
+  goToRegistry() {
+    this.visible = false;
+    this.router.navigate(['/missings'], {
+      queryParams: { tab: 'pending' },
     });
   }
 }

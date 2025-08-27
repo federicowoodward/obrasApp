@@ -63,7 +63,6 @@ export class ConstructionComponent {
     this.api
       .request('GET', `architect/${this.architect?.id}/construction`)
       .subscribe((res) => this.works.set(res as Construction[]));
-    console.log(this.works());
   }
 
   createWork() {

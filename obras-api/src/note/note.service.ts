@@ -19,12 +19,10 @@ export class NoteService {
   ) {}
 
   async create(dto: CreateNoteDto) {
-    // Idealmente dto.elementId (number) y cargamos la relación:
-    // const element = await this.elementRepo.findOneOrFail({ where: { id: dto.elementId } });
     const note = this.noteRepo.create({
       title: dto.title,
       text: dto.text,
-      element: dto.element, // ← si hoy recibís el objeto completo, esto sigue funcionando
+      element: dto.element,
       createdBy: dto.createdBy,
       createdByType: dto.createdByType,
     });
@@ -49,9 +47,7 @@ export class NoteService {
     });
   }
 
-  // 🔥 NUEVO: traer todas las notas de un arquitecto (vía sus elementos)
   async findByArchitect(architectId: number) {
-    // Usamos un join para evitar dos consultas y mapear ids
     return this.noteRepo
       .createQueryBuilder('note')
       .leftJoinAndSelect('note.element', 'element')
@@ -73,7 +69,7 @@ export class NoteService {
       table: 'note',
       recordId: saved.id,
       action: 'update',
-      actorId: (dto as any).updatedBy ?? (dto as any).created_by, // por compatibilidad si tus DTO están en snake_case
+      actorId: (dto as any).updatedBy ?? (dto as any).created_by,
       actorType: ((dto as any).updatedByType ??
         (dto as any).created_by_type) as 'architect' | 'worker',
       oldData: before,
