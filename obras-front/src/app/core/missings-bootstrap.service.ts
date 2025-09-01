@@ -1,11 +1,9 @@
 // core/missings-bootstrap.service.ts
 import { DestroyRef, Injectable, effect, inject } from '@angular/core';
 import { MissingsService } from '../services/missings.service';
-import { timer } from 'rxjs';
+import { timer, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../services/auth.service';
-
-const DEFAULT_POLL_MS = 60_000 * 5;
 
 @Injectable({ providedIn: 'root' })
 export class MissingsBootstrapService {
@@ -16,41 +14,40 @@ export class MissingsBootstrapService {
   private startedForId: number | null = null;
 
   /** Arranque reactivo al login de arquitecto */
-  autoStart(pollMs = DEFAULT_POLL_MS) {
-    effect(
-      () => {
-        const role = this.auth.role();
-        const user = this.auth.user();
+  autoStart(pollMs: number) {
+    effect((onCleanup) => {
+      const roleRaw = this.auth.role();
+      const role = (roleRaw ?? '').toLowerCase();
+      const user = this.auth.user();
 
-        // Sólo para arquitecto logueado
-        if (role !== 'architect' || !user) return;
+      // Si desloguea o no es arquitecto, cortar polling anterior
+      if (role !== 'architect' || !user) {
+        this.startedForId = null;
+        return;
+      }
 
-        // 👇 Ajustá si tu user tiene otro campo que mapea al Architect.id
-        const architectId = user.id;
+      // Tomar architectId real si existe; fallback a user.id
+      const architectId = (user as any).architectId ?? user.id;
+      if (!architectId) return;
 
-        if (!architectId || this.startedForId === architectId) return;
-        this.startedForId = architectId;
+      // Evitar re-iniciar si ya está corriendo para este id
+      if (this.startedForId === architectId) return;
+      this.startedForId = architectId;
 
-        // Fetch inicial
-        this.missings.initForArchitect(architectId).subscribe();
+      // Fetch inicial
+      const initSub = this.missings.initForArchitect(architectId).subscribe();
 
-        // Polling suave
-        timer(pollMs, pollMs)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(() => this.missings.refresh().subscribe());
-      },
-      { allowSignalWrites: true }
-    );
-  }
+      // Polling
+      const pollSub: Subscription = timer(pollMs, pollMs)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.missings.refresh().subscribe());
 
-  /** Alternativa manual desde un layout */
-  start(architectId: number, pollMs = DEFAULT_POLL_MS) {
-    if (this.startedForId === architectId) return;
-    this.startedForId = architectId;
-
-    this.missings.initForArchitect(architectId).subscribe();
-    timer(pollMs, pollMs)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.missings.refresh().subscribe());
+      // Cleanup cuando cambia user/role o se destruye el servicio
+      onCleanup(() => {
+        initSub?.unsubscribe();
+        pollSub?.unsubscribe();
+        this.startedForId = null;
+      });
+    }, { allowSignalWrites: true });
   }
 }

@@ -27,8 +27,8 @@ export class MissingController {
     return this.service.findAll(q);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(':idMissing')
+  findOne(@Param('idMissing', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 

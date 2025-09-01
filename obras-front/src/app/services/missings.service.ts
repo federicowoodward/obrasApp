@@ -70,6 +70,7 @@ export class MissingsService {
   fetch(query: MissingQuery): Observable<{ items: Missing[]; total: number }> {
     this.loading.set(true);
     this.lastQuery.set(query);
+
     return this.api
       .request<{ items: Missing[]; total: number }>(
         'GET',

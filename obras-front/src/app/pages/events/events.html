@@ -1,17 +1,20 @@
 <div class="p-4 w-full overflow-x-scroll sm:overflow-x-hidden">
   <h4 class="pb-2">Filtrar por:</h4>
-  <div class="flex flex-column md:flex-row gap-3 mb-3">
-    <div class="flex flex-row gap-2">
+  <div class="flex flex-column gap-3 mb-3">
+    <div class="flex mt-2 flex-column md:flex-row gap-2">
       <p-iftalabel>
         <label for="type">Tipo</label>
         <select
           class="p-inputtext w-12rem"
-          [value]="filterTable() ?? ''"
-          (change)="onTableChange($event)"
-          id="type"
+          [value]="filterActorType() ?? ''"
+          (change)="onActorChange($event)"
+          id="user"
         >
           <option [value]="''">Todos</option>
-          <option *ngFor="let opt of tableOptions" [value]="opt.value ?? ''">
+          <option
+            *ngFor="let opt of actorTypeOptions"
+            [value]="opt.value ?? ''"
+          >
             {{ opt.label }}
           </option>
         </select>
@@ -48,15 +51,28 @@
         </select>
       </p-iftalabel>
     </div>
-    <div class="flex align-items-center gap-2">
-      <!-- <input
-      pInputText
-      type="text"
-      placeholder="Buscar en eventos..."
-      [(ngModel)]="searchText()"
-      (ngModelChange)="searchText.set($event)"
-      style="min-width: 200px"
-    /> -->
+    <div class="flex gap-4 mt-2">
+      <div>
+        <p class="mb-1">Desde:</p>
+        <p-datepicker
+          [ngModel]="dateFrom()"
+          [maxDate]="dateTo() || null"
+          (ngModelChange)="onDateFromChange($event)"
+          [showIcon]="true"
+        />
+      </div>
+
+      <div>
+        <p class="mb-1">Hasta:</p>
+        <p-datepicker
+          [ngModel]="dateTo()"
+          [minDate]="dateFrom() || null"
+          (ngModelChange)="onDateToChange($event)"
+          [showIcon]="true"
+        />
+      </div>
+    </div>
+    <div class="flex align-items-center gap-2 mt-2">
       <button
         pButton
         type="button"

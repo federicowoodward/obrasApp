@@ -13,7 +13,8 @@ import { Dialog } from 'primeng/dialog';
 import { IftaLabel } from 'primeng/iftalabel';
 import { Router } from '@angular/router';
 import { EventData } from '../../services/event-data.service';
-
+import { DatePicker } from 'primeng/datepicker';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-events',
   standalone: true,
@@ -27,6 +28,8 @@ import { EventData } from '../../services/event-data.service';
     SelectModule,
     Dialog,
     IftaLabel,
+    DatePicker,
+    FormsModule,
   ],
   providers: [MessageService],
   templateUrl: './events.html',
@@ -50,6 +53,52 @@ export class Events implements OnInit {
     createdAt: string;
     email?: string;
   } | null>(null);
+
+  dateFrom = signal<Date | null>(null);
+  dateTo = signal<Date | null>(null);
+
+  private startOfDay(d: Date) {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+  private endOfDay(d: Date) {
+    const x = new Date(d);
+    x.setHours(23, 59, 59, 999);
+    return x;
+  }
+
+  onDateFromChange(d?: Date) {
+    if (!d) {
+      this.dateFrom.set(null);
+      return;
+    }
+    if (this.dateTo() && d > this.dateTo()!) {
+      this.dateTo.set(d);
+      this.messsageService.add({
+        severity: 'info',
+        summary: 'Rango ajustado',
+        detail: '“Desde” > “Hasta”. Se ajustó “Hasta”.',
+      });
+    }
+    this.dateFrom.set(d);
+  }
+
+  onDateToChange(d?: Date) {
+    if (!d) {
+      this.dateTo.set(null);
+      return;
+    }
+    if (this.dateFrom() && d < this.dateFrom()!) {
+      this.dateFrom.set(d);
+      this.messsageService.add({
+        severity: 'info',
+        summary: 'Rango ajustado',
+        detail: '“Hasta” < “Desde”. Se ajustó “Desde”.',
+      });
+    }
+    this.dateTo.set(d);
+  }
 
   ngOnInit() {
     this.eventData.fetchEvents();
@@ -81,18 +130,34 @@ export class Events implements OnInit {
 
   filteredEvents = computed(() => {
     let ev = this.events();
+
+    const from = this.dateFrom();
+    const to = this.dateTo();
+
+    if (from) {
+      const f = this.startOfDay(from);
+      ev = ev.filter((e) => new Date(e.createdAt) >= f);
+    }
+    if (to) {
+      const t = this.endOfDay(to);
+      ev = ev.filter((e) => new Date(e.createdAt) <= t);
+    }
+
     // Filtro por tabla
     if (this.filterTable())
       ev = ev.filter((e) => e.tableName === this.filterTable());
+
     // Filtro por tipo de acción (match parcial en español)
     if (this.filterAction())
       ev = ev.filter((e) =>
         e.action.toLowerCase().includes(this.filterAction()!)
       );
+
     // Filtro por tipo de usuario
     if (this.filterActorType())
       ev = ev.filter((e) => e.changedByType === this.filterActorType());
-    // Búsqueda global (en action, oldData, newData, etc)
+
+    // Búsqueda global
     if (this.searchText()) {
       const txt = this.searchText().toLowerCase();
       ev = ev.filter(
@@ -105,6 +170,7 @@ export class Events implements OnInit {
           (e.newData && JSON.stringify(e.newData).toLowerCase().includes(txt))
       );
     }
+
     return ev;
   });
 
@@ -128,14 +194,14 @@ export class Events implements OnInit {
       },
     });
   }
-
   resetFilters() {
     this.filterTable.set(null);
     this.filterAction.set(null);
     this.filterActorType.set(null);
     this.searchText.set('');
+    this.dateFrom.set(null);
+    this.dateTo.set(null);
   }
-
   openChangedByInfo(data: any) {
     const { password, ...safeData } = data;
     this.changedByDialog.set(safeData);

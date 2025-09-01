@@ -10,6 +10,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { EventDetail } from './pages/event-detail/event-detail';
 import { NoteEditor } from './pages/note-editor/note-editor';
+import { MissingRegistry } from './pages/missing-registry/missing-registry';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,9 +32,17 @@ export const routes: Routes = [
   },
   { path: 'deposit', component: Deposit, canActivate: [AuthGuard] },
   { path: 'events', component: Events, canActivate: [AuthGuard] },
+  { path: 'missings', component: MissingRegistry, canActivate: [AuthGuard] },
   { path: 'event/:id', component: EventDetail, canActivate: [AuthGuard] },
   { path: 'notes', component: Notes, canActivate: [AuthGuard] },
   { path: 'note-editor/:id', component: NoteEditor, canActivate: [AuthGuard] },
   { path: 'note-editor/new', component: NoteEditor, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: '' },
+  { path: 'worker/elements', component: Deposit },
+  {
+    path: 'worker/missings',
+    component: MissingRegistry,
+    canActivate: [AuthGuard],
+  },
+  { path: 'worker/notas', component: Notes, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '/login' },
 ];

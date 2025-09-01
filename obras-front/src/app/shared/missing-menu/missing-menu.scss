@@ -27,16 +27,17 @@
       width: 100% !important;
     }
   }
+
   .p-button {
     z-index: 5;
-    // --p-button-primary-background: var(--p-surface-800);
-    // --p-button-primary-color: white;
-    // --p-button-primary-border-color: #eab308;
-    // --p-button-primary-hover-background: #eab308;
-    // --p-button-primary-hover-border-color: #eab308;
-    // --p-button-primary-hover-color: #18181b;
-    // --p-button-primary-active-background: #eab308;
-    // --p-button-primary-active-border-color: #eab308;
+  }
+
+  .p-drawer-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: start !important;
+    height: 100%;
+    padding: 1rem 1rem;
   }
 }
 

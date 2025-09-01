@@ -1,0 +1,64 @@
+👉 Implementar funcionalidad por funcionalidad, usando este orden:
+
+🔐 auth/: login
+
+👷‍♂️ architect/: alta
+
+🏗️ construction/ + 🛠️ construction-worker/: CRUDs
+
+🔩 element/ + 🏢 deposit/: CRUD listo 
+
+ falta movimiento de elements listo
+
+--> logger listo, falta asegurarse que funciona en todos lados.
+--> 🕓 events-history/: registro de acciones
+
+--> 📸 construction-snapshot/: cierre de obra 
+
+❗ missing/ + 📝 note/: gestión y eliminación
+
+################################
+
+Me falta hacer rutas para ver historial! (un simple LIST bastaria)
+
+Falta crear pantallas: 
+Acomodar scroll de tabla materiales.
+Posibilidad de crear depositos y administrarlos en la pantalla de   depositos. 
+Historial de eventos funcional,
+Almacen de notas. 
+
+
+FALTAN 28/07
+Actualizar y crear notas (actualmente solo logea)
+Asegurarse que todos los eventos sean registrados.
+Revisar dise;o general.
+Posibilidad de crear depositos y administrarlos en la pantalla de depositos. 
+
+
+
+21/08: 
+Falta revisar el funcionamiento y guardado de notas. 
+El historial tira un error. 
+Asegurarse que todos los eventos sean registrados en backend. 
+Asegurarse que todos los eventos sean registrados.
+
+27/08
+Pantalla de administrar faltantes (y no se estan viendo actualmente)
+Armar pantallas para obreros 
+
+31/08
+Listo menu faltantes y ya aparecen en el registro, falta revisar todas las funcionalidades que puede hacer arquitecto (cambiar stutus y no se si otra mas.)
+Armar pantallas para obreros 
+
+01/08
+Facil: Meter bignumbers en el inicio con datos X de obras obreros y demas
+Agregar estado a elementos: 
+-null = Normal
+- alquilado = 1
+- reparar = 2
+- roto = 3 
+- perdido = 4
+mostrar con simbolito o colore en tabla de elementos. 
+
+Obrero: 
+- Meter una version mobile con nav arriba (menu: elementos, faltantes, notas y agregar o mover esas cosas.)

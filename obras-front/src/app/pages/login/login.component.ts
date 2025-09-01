@@ -50,7 +50,14 @@ export class LoginComponent {
     this.api.request('POST', 'auth/login', this.form.value).subscribe({
       next: (res: any) => {
         this.auth.setAuth(res.user, res.role); // Guarda en el servicio global
-        this.router.navigate(['/']); // Redirecciona donde quieras
+        if (res.role === 'architect') {
+          this.router.navigate(['/']); // Redirecciona donde quieras
+        } else if (res.role === 'worker') {
+          console.log('worker hola');
+          this.router.navigate(['worker/elements']);
+        } else {
+          throw new Error('Role no reconocido');
+        }
       },
       error: (err) => {
         this.msg.add({

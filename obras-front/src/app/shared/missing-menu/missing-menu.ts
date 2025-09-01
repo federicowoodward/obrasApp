@@ -41,8 +41,6 @@ export class MissingMenu implements OnInit {
 
   goToRegistry() {
     this.visible = false;
-    this.router.navigate(['/missings'], {
-      queryParams: { tab: 'pending' },
-    });
+    this.router.navigate(['/missings']);
   }
 }
