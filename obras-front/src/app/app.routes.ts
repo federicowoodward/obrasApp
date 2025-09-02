@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { Dashboard } from './pages/dashboard/dashboard';
 import { ConstructionComponent } from './pages/construction/construction';
 import { ConstructionDetail } from './pages/construction-detail/construction-detail';
@@ -12,37 +13,48 @@ import { EventDetail } from './pages/event-detail/event-detail';
 import { NoteEditor } from './pages/note-editor/note-editor';
 import { MissingRegistry } from './pages/missing-registry/missing-registry';
 
+import { ArchitectLayout } from './layouts/architect-layout';
+import { WorkerLayout } from './layouts/worker-layout';
+
 export const routes: Routes = [
+  // Login sin layout
   { path: 'login', component: LoginComponent },
-  { path: '', component: Dashboard, canActivate: [AuthGuard] },
+
+  // Grupo ARQUITECTO (usa ArchitectLayout)
   {
-    path: 'construction-workers',
-    component: ConstructionWorkers,
+    path: '',
+    component: ArchitectLayout,
     canActivate: [AuthGuard],
+    data: { roles: ['architect'] },
+    children: [
+      { path: '', component: Dashboard },
+      { path: 'construction-workers', component: ConstructionWorkers },
+      { path: 'constructions', component: ConstructionComponent },
+      { path: 'construction/:id', component: ConstructionDetail },
+      { path: 'deposit', component: Deposit },
+      { path: 'events', component: Events },
+      { path: 'missings', component: MissingRegistry },
+      { path: 'event/:id', component: EventDetail },
+      { path: 'notes', component: Notes },
+      { path: 'note-editor/:id', component: NoteEditor },
+      { path: 'note-editor/new', component: NoteEditor },
+    ],
   },
+
+  // Grupo WORKER (usa WorkerLayout)
   {
-    path: 'constructions',
-    component: ConstructionComponent,
+    path: 'worker',
+    component: WorkerLayout,
     canActivate: [AuthGuard],
+    data: { roles: ['worker'] },
+    children: [
+      { path: 'elements', component: Deposit },
+      { path: 'missings', component: MissingRegistry },
+      { path: 'notas', component: Notes },
+      { path: '', pathMatch: 'full', redirectTo: 'elements' },
+    ],
   },
-  {
-    path: 'construction/:id',
-    component: ConstructionDetail,
-    canActivate: [AuthGuard],
-  },
-  { path: 'deposit', component: Deposit, canActivate: [AuthGuard] },
-  { path: 'events', component: Events, canActivate: [AuthGuard] },
-  { path: 'missings', component: MissingRegistry, canActivate: [AuthGuard] },
-  { path: 'event/:id', component: EventDetail, canActivate: [AuthGuard] },
-  { path: 'notes', component: Notes, canActivate: [AuthGuard] },
-  { path: 'note-editor/:id', component: NoteEditor, canActivate: [AuthGuard] },
-  { path: 'note-editor/new', component: NoteEditor, canActivate: [AuthGuard] },
-  { path: 'worker/elements', component: Deposit },
-  {
-    path: 'worker/missings',
-    component: MissingRegistry,
-    canActivate: [AuthGuard],
-  },
-  { path: 'worker/notas', component: Notes, canActivate: [AuthGuard] },
+
+  // Wildcard
   { path: '**', redirectTo: '/login' },
 ];

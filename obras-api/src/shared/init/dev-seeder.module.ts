@@ -9,7 +9,6 @@ import { Construction } from '../entities/construction.entity';
 import { ConstructionWorker } from '../entities/construction-worker.entity';
 import { Deposit } from '../entities/deposit.entity';
 import { Element } from '../entities/element.entity';
-import { ElementLocation } from '../entities/element-location.entity';
 import { Note } from '../entities/note.entity';
 import { Missing } from '../entities/missing.entity';
 
@@ -23,7 +22,6 @@ import { Missing } from '../entities/missing.entity';
       ConstructionWorker,
       Deposit,
       Element,
-      ElementLocation,
       Note,
       Missing,
     ]),

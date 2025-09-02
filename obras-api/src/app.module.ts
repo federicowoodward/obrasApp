@@ -8,9 +8,7 @@ import { ElementModule } from './element/element.module';
 import { NoteModule } from './note/note.module';
 import { MissingModule } from './missing/missing.module';
 import { EventsHistoryModule } from './events-history/events-history.module';
-import { ElementMoveDetailModule } from './element-move-detail/element-move-detail.module';
 import { ConstructionSnapshotModule } from './construction-snapshot/construction-snapshot.module';
-import { ElementLocationModule } from './element-location/element-location.module';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
@@ -20,6 +18,7 @@ import { ElementMoveModule } from './element-move/element-move.module';
 import { SeederModule } from './shared/init/seeder.module';
 import { DbReadyLoggerService } from './shared/services/db-ready-logger/db-ready-logger.service';
 import { DevSeederModule } from './shared/init/dev-seeder.module';
+import { StadisticsModule } from './stadistics/stadistics/stadistics.module';
 
 @Module({
   imports: [
@@ -30,22 +29,21 @@ import { DevSeederModule } from './shared/init/dev-seeder.module';
     ConstructionWorkerModule,
     DepositModule,
     ElementModule,
+    ElementMoveModule,
     NoteModule,
     MissingModule,
     EventsHistoryModule,
     ConstructionSnapshotModule,
-    ElementMoveDetailModule,
-    ElementLocationModule,
     ElementMoveModule,
     CategoryModule,
     // SeederModule,
     DevSeederModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     ConfigModule.forRoot({
-      envFilePath: `.env`, 
+      envFilePath: `.env`,
       isGlobal: true,
     }),
-    ElementMoveModule,
+    StadisticsModule,
   ],
   controllers: [],
   providers: [DbReadyLoggerService],

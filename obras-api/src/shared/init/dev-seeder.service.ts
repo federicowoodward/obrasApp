@@ -1,17 +1,18 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { Architect } from '../entities/architect.entity';
 import { Construction } from '../entities/construction.entity';
 import { ConstructionWorker } from '../entities/construction-worker.entity';
 import { Deposit } from '../entities/deposit.entity';
 import { Element } from '../entities/element.entity';
-import { ElementLocation } from '../entities/element-location.entity';
 import { Note } from '../entities/note.entity';
 import { Missing } from '../entities/missing.entity';
 import { Category } from '../entities/category.entity';
 import { PlanLimit } from '../entities/plan-limit.entity';
-import * as bcrypt from 'bcryptjs';
+import { LocationType } from '../enums/location-type.enum';
+
 @Injectable()
 export class DevSeederService implements OnApplicationBootstrap {
   private readonly logger = new Logger(DevSeederService.name);
@@ -28,8 +29,6 @@ export class DevSeederService implements OnApplicationBootstrap {
     private workerRepo: Repository<ConstructionWorker>,
     @InjectRepository(Deposit) private depositRepo: Repository<Deposit>,
     @InjectRepository(Element) private elementRepo: Repository<Element>,
-    @InjectRepository(ElementLocation)
-    private locationRepo: Repository<ElementLocation>,
     @InjectRepository(Note) private noteRepo: Repository<Note>,
     @InjectRepository(Missing) private missingRepo: Repository<Missing>,
   ) {}
@@ -44,10 +43,22 @@ export class DevSeederService implements OnApplicationBootstrap {
       this.logger.log('🔁 Reset + seed DEV iniciando…');
 
       await this.dataSource.transaction(async (m) => {
-        // 1) TRUNCATE TODO con CASCADE
+        await m.query(`
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'location_type_enum') THEN
+              CREATE TYPE location_type_enum AS ENUM ('construction', 'deposit');
+            END IF;
+          END $$;
+        `);
+
+        await m.query(`
+          ALTER TABLE "element"
+            ADD COLUMN IF NOT EXISTS "current_location_type" location_type_enum NULL,
+            ADD COLUMN IF NOT EXISTS "current_location_id"   integer NULL;
+        `);
+
         await m.query(`
           TRUNCATE TABLE 
-            "element_location",
             "element",
             "note",
             "missing",
@@ -60,7 +71,7 @@ export class DevSeederService implements OnApplicationBootstrap {
           RESTART IDENTITY CASCADE;
         `);
 
-        // 2) Seed Planes y Categorías (necesarios para FKs posteriores)
+        // 2) Planes
         const [free, pro] = await m.save(PlanLimit, [
           m.create(PlanLimit, {
             name: 'Free',
@@ -78,12 +89,13 @@ export class DevSeederService implements OnApplicationBootstrap {
           }),
         ]);
 
+        // 3) Categorías
         const [herr, mat] = await m.save(Category, [
           m.create(Category, { name: 'Herramienta' }),
           m.create(Category, { name: 'Material' }),
         ]);
 
-        // 3) Seed Architect
+        // 4) Arquitecto
         const saltRounds = 10;
         const raw = '1234';
         const hash = await bcrypt.hash(raw, saltRounds);
@@ -93,11 +105,10 @@ export class DevSeederService implements OnApplicationBootstrap {
             name: 'Federico Lopez',
             email: 'fede@ejemplo.com',
             password: hash,
-            paymentLevel: pro, // existe
+            paymentLevel: pro,
           }),
         );
 
-        // 4) Seed Construction + Workers + Deposit
         const constr = await m.save(
           Construction,
           m.create(Construction, {
@@ -109,14 +120,14 @@ export class DevSeederService implements OnApplicationBootstrap {
 
         const [worker1, worker2] = await m.save(ConstructionWorker, [
           m.create(ConstructionWorker, {
-            name: 'Juan Pérez',
-            password: 'hashedpassword',
+            name: 'juan@ejemplo.com',
+            password: hash,
             architect: arch,
             construction: constr,
           }),
           m.create(ConstructionWorker, {
-            name: 'Lucas Gómez',
-            password: 'hashedpassword',
+            name: 'lucas@ejemplo.com',
+            password: hash,
             architect: arch,
             construction: constr,
           }),
@@ -130,7 +141,7 @@ export class DevSeederService implements OnApplicationBootstrap {
           }),
         );
 
-        // 5) Seed Notes (al menos una para probar relación 1–1)
+        // 6) Nota (1–1 opcional con Element)
         const note1 = await m.save(
           Note,
           m.create(Note, {
@@ -141,7 +152,7 @@ export class DevSeederService implements OnApplicationBootstrap {
           }),
         );
 
-        // 6) Seed Elements (mezcla con y sin nota)
+        // 7) Elements (👉 ahora con ubicación directa en las columnas nuevas)
         const el1 = await m.save(
           Element,
           m.create(Element, {
@@ -150,8 +161,10 @@ export class DevSeederService implements OnApplicationBootstrap {
             provider: 'Ferretería Central',
             buyDate: '2024-01-15',
             architect: arch,
-            category: herr, // existe
-            note: note1, // con nota
+            category: herr,
+            note: note1,
+            currentLocationType: LocationType.DEPOSIT, // <—
+            currentLocationId: depo.id, // <—
           }),
         );
 
@@ -164,29 +177,13 @@ export class DevSeederService implements OnApplicationBootstrap {
             buyDate: '2024-03-02',
             architect: arch,
             category: mat,
-            note: null, // SIN nota (note_id NULL)
+            note: null,
+            currentLocationType: LocationType.CONSTRUCTION, // <—
+            currentLocationId: constr.id, // <—
           }),
         );
 
-        // 7) Seed Locations
-        await m.save(
-          ElementLocation,
-          m.create(ElementLocation, {
-            locationType: 'deposit',
-            locationId: depo.id,
-            element: el1,
-          }),
-        );
-        await m.save(
-          ElementLocation,
-          m.create(ElementLocation, {
-            locationType: 'construction',
-            locationId: constr.id,
-            element: el2,
-          }),
-        );
-
-        // 8) Seed Missings
+        // 8) Missings
         await m.save(
           Missing,
           m.create(Missing, {

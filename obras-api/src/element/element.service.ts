@@ -1,14 +1,11 @@
-// src/element/element.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Element } from 'src/shared/entities/element.entity';
-import { CreateElementDto } from './dto/create-element.dto';
 import { Architect } from 'src/shared/entities/architect.entity';
 import { Category } from 'src/shared/entities/category.entity';
 import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
-import { ElementLocationService } from 'src/element-location/element-location.service';
-import { ElementLocation } from 'src/shared/entities/element-location.entity';
+import { UpsertElementDto } from './dto/upsert-element.dto';
 
 @Injectable()
 export class ElementService {
@@ -23,10 +20,9 @@ export class ElementService {
     private readonly architectRepo: Repository<Architect>,
 
     private readonly logger: EventsHistoryLoggerService,
-    private readonly locationService: ElementLocationService,
   ) {}
 
-  async create(architectId: number, dto: CreateElementDto) {
+  async create(architectId: number, dto: UpsertElementDto) {
     const architect = await this.architectRepo.findOne({
       where: { id: architectId },
     });
@@ -38,17 +34,17 @@ export class ElementService {
     if (!category) throw new NotFoundException('Categoría no encontrada');
 
     const element = this.elementRepo.create({
-      ...dto,
+      name: dto.name,
+      brand: dto.brand,
+      provider: dto.provider,
+      buyDate: dto.buyDate,
       category,
       architect,
+      currentLocationType: dto.currentLocationType ?? null,
+      currentLocationId: dto.currentLocationId ?? null,
     });
 
     const saved = await this.elementRepo.save(element);
-
-    await this.locationService.updateLocation(saved.id, {
-      locationType: 'deposit',
-      locationId: dto.locationId,
-    });
 
     await this.logger.logEvent({
       table: 'element',
@@ -65,11 +61,11 @@ export class ElementService {
   async findAll(architectId: number) {
     return this.elementRepo.find({
       where: { architect: { id: architectId } },
-      relations: ['category', 'location', 'note'],
+      relations: ['category', 'note'], 
     });
   }
 
-  async update(architectId: number, id: number, dto: CreateElementDto) {
+  async update(architectId: number, id: number, dto: UpsertElementDto) {
     const existing = await this.elementRepo.findOne({
       where: { id, architect: { id: architectId } },
       relations: ['category'],
@@ -81,11 +77,6 @@ export class ElementService {
     });
     if (!category) throw new NotFoundException('Categoría no encontrada');
 
-    await this.locationService.updateLocation(id, {
-      locationType: dto.locationType,
-      locationId: dto.locationId,
-    });
-
     const oldData = { ...existing };
 
     existing.name = dto.name;
@@ -93,6 +84,13 @@ export class ElementService {
     existing.provider = dto.provider;
     existing.buyDate = dto.buyDate;
     existing.category = category;
+
+    if (dto.currentLocationType !== undefined) {
+      existing.currentLocationType = dto.currentLocationType;
+    }
+    if (dto.currentLocationId !== undefined) {
+      existing.currentLocationId = dto.currentLocationId;
+    }
 
     const updated = await this.elementRepo.save(existing);
 

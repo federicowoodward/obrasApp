@@ -1,44 +1,54 @@
-// src/element-move/element-move.service.ts
 import { Injectable } from '@nestjs/common';
-import { ElementLocationService } from 'src/element-location/element-location.service';
-import { ElementMoveDetailService } from 'src/element-move-detail/element-move-detail.service';
-import { MoveElementDto } from './dto/move-element.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Element } from 'src/shared/entities/element.entity';
 import { EventsHistoryLoggerService } from 'src/shared/services/events-history/events-history-logger.service';
+import { MoveElementDto } from './dto/move-element.dto';
 
 @Injectable()
 export class ElementMoveService {
   constructor(
     private readonly logger: EventsHistoryLoggerService,
-    private readonly locationService: ElementLocationService,
-    private readonly moveDetailService: ElementMoveDetailService,
+    @InjectRepository(Element)
+    private readonly elementRepo: Repository<Element>,
   ) {}
 
   async move(dto: MoveElementDto) {
-    // 1. Actualizar ubicación actual
-    await this.locationService.updateLocation(dto.elementId, {
-      locationType: dto.toType,
-      locationId: dto.toId,
-    });
+    const element = await this.elementRepo.findOneBy({ id: dto.elementId });
+    if (!element) {
+      // Podés lanzar NotFoundException si preferís
+      return { moved: false };
+    }
 
-    // 2. Log en EventsHistory
-    const event = await this.logger.logEvent({
+    // no-op si es el mismo lugar
+    if (
+      element.currentLocationType === dto.toType &&
+      element.currentLocationId === dto.toId
+    ) {
+      return { moved: false };
+    }
+
+    const oldData = {
+      locationType: element.currentLocationType,
+      locationId: element.currentLocationId,
+    };
+
+    element.currentLocationType = dto.toType;
+    element.currentLocationId = dto.toId;
+
+    await this.elementRepo.save(element);
+
+    await this.logger.logEvent({
       table: 'element',
-      recordId: dto.elementId,
+      recordId: element.id,
       action: 'move',
       actorId: dto.movedBy,
       actorType: dto.movedByType,
-      oldData: { locationType: dto.fromType, locationId: dto.fromId },
-      newData: { locationType: dto.toType, locationId: dto.toId },
-    });
-
-    // 3. Guardar detalle
-    await this.moveDetailService.saveMove({
-      eventId: event.id,
-      elementId: dto.elementId,
-      fromType: dto.fromType,
-      fromId: dto.fromId,
-      toType: dto.toType,
-      toId: dto.toId,
+      oldData,
+      newData: {
+        locationType: element.currentLocationType,
+        locationId: element.currentLocationId,
+      },
     });
 
     return { moved: true };

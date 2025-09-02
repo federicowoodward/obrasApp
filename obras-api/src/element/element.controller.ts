@@ -9,8 +9,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ElementService } from './element.service';
-import { CreateElementDto } from './dto/create-element.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
+import { UpsertElementDto } from './dto/upsert-element.dto';
 
 @ApiTags('Element')
 @Controller('architect/:architectId/element')
@@ -20,10 +20,10 @@ export class ElementController {
   @Post()
   @ApiOperation({ summary: 'Crear elemento' })
   @ApiParam({ name: 'architectId', type: Number })
-  @ApiBody({ type: CreateElementDto })
+  @ApiBody({ type: UpsertElementDto })
   create(
     @Param('architectId') architectId: number,
-    @Body() dto: CreateElementDto,
+    @Body() dto: UpsertElementDto,
   ) {
     return this.elementService.create(+architectId, dto);
   }
@@ -42,7 +42,7 @@ export class ElementController {
   update(
     @Param('architectId') architectId: number,
     @Param('id') id: number,
-    @Body() dto: CreateElementDto,
+    @Body() dto: UpsertElementDto,
   ) {
     return this.elementService.update(+architectId, +id, dto);
   }

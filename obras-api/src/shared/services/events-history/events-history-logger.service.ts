@@ -15,7 +15,7 @@ interface LogEventOptions {
     | 'close'
     | 'restore';
   actorId: number;
-  actorType: 'architect' | 'worker';
+  actorType: 'architect' | 'worker' | 'admin';
   oldData?: any;
   newData?: any;
 }

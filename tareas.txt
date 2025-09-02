@@ -51,6 +51,7 @@ Listo menu faltantes y ya aparecen en el registro, falta revisar todas las funci
 Armar pantallas para obreros 
 
 01/08
+SE CAMBIO LA FORMA EN LA QUE SE MUEVEN ELEMENTOS.
 Facil: Meter bignumbers en el inicio con datos X de obras obreros y demas
 Agregar estado a elementos: 
 -null = Normal

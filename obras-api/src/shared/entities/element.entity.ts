@@ -9,7 +9,7 @@ import {
 import { Category } from './category.entity';
 import { Architect } from './architect.entity';
 import { Note } from './note.entity';
-import { ElementLocation } from './element-location.entity';
+import { LocationType } from '../enums/location-type.enum';
 
 @Entity()
 export class Element {
@@ -31,18 +31,30 @@ export class Element {
   @ManyToOne(() => Category)
   category: Category;
 
-  @OneToOne(() => ElementLocation, (location) => location.element)
-  location: ElementLocation;
-
   @ManyToOne(() => Architect)
   architect: Architect;
 
   @OneToOne(() => Note, (note) => note.element, {
     nullable: true,
-    onDelete: 'SET NULL', 
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'note_id' })
   note: Note | null;
+
+  @Column({
+    type: 'enum',
+    enum: LocationType,
+    nullable: true,
+    name: 'current_location_type',
+  })
+  currentLocationType: LocationType | null;
+
+  @Column({
+    type: 'int',
+    nullable: true,
+    name: 'current_location_id',
+  })
+  currentLocationId: number | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -1,14 +1,74 @@
-<div class="p-5 flex flex-column gap-3">
-  <h2 class="text-3xl">Actividad reciente</h2>
-  <ul class="list-none flex flex-column gap-3">
-    <p-card header="👷‍♂️ Juan Pérez">
-      <p class="m-0">Entrada: 08:00 | Salida: 16:30</p>
-      <p class="m-0">🛠️ Herramientas: Taladro, Martillo</p>
+<div class="grid">
+  <div class="col-12 md:col-2">
+    <p-card header="Obras">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.constructions ?? 0 }}
+      </div>
     </p-card>
+  </div>
+  <div class="col-12 md:col-2">
+    <p-card header="Obreros">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.workers ?? 0 }}
+      </div>
+    </p-card>
+  </div>
+  <div class="col-12 md:col-2">
+    <p-card header="Depósitos">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.deposits ?? 0 }}
+      </div>
+    </p-card>
+  </div>
+  <div class="col-12 md:col-2">
+    <p-card header="Elementos">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.elements ?? 0 }}
+      </div>
+    </p-card>
+  </div>
+  <div class="col-12 md:col-2">
+    <p-card header="Notas">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.notes ?? 0 }}
+      </div>
+    </p-card>
+  </div>
+  <div class="col-12 md:col-2">
+    <p-card header="Faltantes">
+      <div class="text-4xl font-bold text-center">
+        {{ data().counts?.missings ?? 0 }}
+      </div>
+    </p-card>
+  </div>
 
-    <p-card header="👷‍♂️ Lucía Gómez">
-      <p class="m-0">Entrada: 09:00 | Salida: 17:00</p>
-      <p class="m-0">🛠️ Herramientas: Llave inglesa, Sierra</p>
+  <div class="col-12">
+    <p-card header="Últimos movimientos">
+      <div
+        class="flex flex-column gap-2"
+        *ngIf="data().last5Moves?.length; else empty"
+      >
+        <div
+          class="flex justify-content-between border-1 surface-border border-round p-2"
+          *ngFor="let m of data().last5Moves"
+        >
+          <div>
+            <div class="text-sm text-600">Elemento #{{ m.elementId }}</div>
+            <div class="text-xs">
+              <b>from</b>: {{ m.from?.locationType }} #{{ m.from?.locationId }}
+              &nbsp;→&nbsp; <b>to</b>: {{ m.to?.locationType }} #{{
+              m.to?.locationId }}
+            </div>
+          </div>
+          <div class="text-right text-sm">
+            <div>{{ m.when | date:'yyyy-MM-dd HH:mm' }}</div>
+            <div class="text-600">{{ m.actorType }} #{{ m.actorId }}</div>
+          </div>
+        </div>
+      </div>
+      <ng-template #empty>
+        <div class="text-600">Sin movimientos registrados.</div>
+      </ng-template>
     </p-card>
-  </ul>
+  </div>
 </div>

@@ -49,12 +49,11 @@ export class LoginComponent {
 
     this.api.request('POST', 'auth/login', this.form.value).subscribe({
       next: (res: any) => {
-        this.auth.setAuth(res.user, res.role); // Guarda en el servicio global
+        this.auth.setAuth(res.user, res.role);
         if (res.role === 'architect') {
-          this.router.navigate(['/']); // Redirecciona donde quieras
+          this.router.navigate(['/']); // ✅ absoluta
         } else if (res.role === 'worker') {
-          console.log('worker hola');
-          this.router.navigate(['worker/elements']);
+          this.router.navigate(['/worker/elements']); // ✅ absoluta
         } else {
           throw new Error('Role no reconocido');
         }
